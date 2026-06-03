@@ -31,12 +31,12 @@ export default function GlobalError({
         </h1>
         <p className="mt-6 text-[16px] leading-[26px] text-[#666] max-w-[560px] mx-auto">
           You can try the action again, or return to the {siteConfig.name} homepage. If the problem
-          persists, please report it via our{' '}
+          persists, please let us know via our{' '}
           <Link
-            href={siteConfig.vulnerabilityDisclosurePath}
-            className="text-[#0073e6] underline decoration-dotted hover:decoration-solid"
+            href="/contact"
+            className="text-primary underline decoration-dotted hover:decoration-solid"
           >
-            disclosure form
+            contact page
           </Link>
           .
         </p>
@@ -47,13 +47,13 @@ export default function GlobalError({
           <button
             type="button"
             onClick={reset}
-            className="inline-flex items-center justify-center bg-[#0073e6] hover:bg-[#005BB7] text-white px-6 py-3 text-[16px] font-semibold transition-colors"
+            className="inline-flex items-center justify-center rounded-full bg-primary hover:bg-primary-dark text-white px-6 py-3 text-[16px] font-semibold transition-colors"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="inline-flex items-center justify-center border border-[#0073e6] text-[#0073e6] hover:bg-[#0073e6] hover:text-white px-6 py-3 text-[16px] font-semibold transition-colors"
+            className="inline-flex items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 text-[16px] font-semibold transition-colors"
           >
             Go home
           </Link>

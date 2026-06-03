@@ -1,12 +1,15 @@
 /**
- * Central site configuration for Free For Charity template sites.
+ * Central site configuration for the Cactus Wren Cooperative Preschool site.
  *
- * EDIT THIS FILE to customize a new FFC-supported nonprofit site.
- * Most values that vary between sites flow from here so individual
- * pages, metadata, sitemap, robots, and security headers stay in sync.
+ * This site was migrated off Wix into the Free For Charity Next.js template.
+ * All content, media, and documents are served locally so the site is fully
+ * decoupled from Wix.
  *
- * After editing, run `npm run check:drift` to verify nothing here drifts
- * away from FFC best practices (placeholder URLs left in, etc.).
+ * NOTE ON URL: While DNS still points the custom domain (cactuswrenpreschool.com)
+ * at Wix, this build is deployed to the default GitHub Pages project URL:
+ *   https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com
+ * Once DNS is transferred, add a public/CNAME file with the custom domain and
+ * update `url` below to https://www.cactuswrenpreschool.com.
  */
 
 export type SiteSocialLink = {
@@ -25,28 +28,17 @@ export type SiteConfig = {
   description: string
   /**
    * Shorter description tuned for OG/Twitter social card previews.
-   * Falls back to `description` if empty. Aim for <= 200 chars and avoid
-   * em-dashes — some card renderers break on them.
+   * Falls back to `description` if empty.
    */
   shortDescription: string
-  /**
-   * Canonical production URL with no trailing slash.
-   * Used by metadataBase, sitemap, and robots. The drift check verifies that
-   * this is updated whenever public/CNAME points to a custom domain, and
-   * that public/.well-known/security.txt no longer carries the placeholder.
-   */
+  /** Canonical production URL with no trailing slash. */
   url: string
   /**
-   * Twitter / X handle including the leading @ — e.g. `@freeforcharity`.
-   * Empty string omits the twitter:site meta entirely. Handles without `@`
-   * are auto-prefixed so a typo doesn't silently break attribution.
+   * Twitter / X handle including the leading @. Empty string omits the
+   * twitter:site meta entirely.
    */
   twitterHandle: string
-  /**
-   * Primary contact email. Used by your own pages; security.txt carries
-   * its own `Contact:` line and is not auto-derived from this value.
-   * Keep them in sync manually when you change either.
-   */
+  /** Primary contact email. */
   contactEmail: string
   /** SEO keywords used in the root layout metadata. */
   keywords: readonly string[]
@@ -59,40 +51,39 @@ export type SiteConfig = {
 }
 
 export const siteConfig: SiteConfig = {
-  name: 'Free For Charity',
-  tagline: 'Reduce Costs, Increase Impact',
+  name: 'Cactus Wren Cooperative Preschool',
+  tagline: 'A Play-Based Preschool in Sierra Vista, Arizona',
   description:
-    'Free For Charity connects students, professionals, and businesses with nonprofits to reduce costs and increase revenues—putting more resources back into their missions.',
+    'Cactus Wren Cooperative Preschool is a secular, play-based, non-profit preschool established in 1979 in Sierra Vista, Arizona, offering affordable preschool and Pre-K programs for children ages 3 to 5.',
   shortDescription:
-    'Connecting students, professionals, and businesses with nonprofits to reduce costs and increase revenues.',
-  url: 'https://ffcworkingsite1.org',
-  twitterHandle: '@freeforcharity',
-  contactEmail: 'security@freeforcharity.org',
+    'A secular, play-based, non-profit cooperative preschool in Sierra Vista, AZ, serving children ages 3 to 5 since 1979.',
+  // Bare origin only (the drift check enforces no path component). On this
+  // GitHub Pages project deploy the `/FFC-EX-cactuswrenpreschool.com` subpath
+  // is supplied at build time via NEXT_PUBLIC_BASE_PATH / assetPath(), so
+  // asset URLs still resolve correctly. When DNS is transferred, add a
+  // public/CNAME and change this to https://www.cactuswrenpreschool.com.
+  url: 'https://freeforcharity.github.io',
+  twitterHandle: '',
+  contactEmail: 'cactuswrenpreschool@gmail.com',
   keywords: [
-    'nonprofit',
-    'charity',
-    'volunteer',
-    'donate',
-    'free hosting',
-    'domains',
-    'Microsoft 365',
+    'preschool',
+    'Sierra Vista preschool',
+    'play-based preschool',
+    'Pre-K',
+    'cooperative preschool',
+    'early childhood education',
+    'Cactus Wren',
+    'Arizona preschool',
   ],
-  themeColor: '#ffffff',
-  vulnerabilityDisclosurePath: '/vulnerability-disclosure-policy',
-  social: [
-    { label: 'Facebook', href: 'https://www.facebook.com/freeforcharity' },
-    { label: 'X (Twitter)', href: 'https://x.com/freeforcharity1' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/company/freeforcharity/' },
-    { label: 'GitHub', href: 'https://github.com/FreeForCharity/FFC_Single_Page_Template' },
-  ],
+  themeColor: '#2f7da3',
+  vulnerabilityDisclosurePath: '/privacy-policy',
+  social: [{ label: 'Facebook', href: 'https://www.facebook.com/cactuswrenpreschool' }],
 }
 
 /**
  * Compose a fully-qualified URL on this site.
  *
  * The path is required to be a same-origin absolute path (starting with `/`).
- * This rules out protocol-relative inputs like `//evil.com` that could leak
- * into a future redirect or canonical link.
  */
 export function siteUrl(path = '/'): string {
   if (typeof path !== 'string' || !path.startsWith('/') || path.startsWith('//')) {
@@ -106,9 +97,7 @@ export function siteUrl(path = '/'): string {
 
 /**
  * Returns the Twitter handle with a guaranteed leading `@`.
- * Returns `undefined` (so the meta tag is omitted) if the handle is empty
- * or is just an `@` with no body — emitting a bare `@` would advertise a
- * malformed handle to Twitter's scraper.
+ * Returns `undefined` (so the meta tag is omitted) if the handle is empty.
  */
 export function twitterSite(): string | undefined {
   const raw = siteConfig.twitterHandle.trim().replace(/^@+/, '')

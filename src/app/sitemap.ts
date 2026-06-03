@@ -25,13 +25,22 @@ type SitemapEntry = {
 // changeFrequency: 'monthly' for content pages, 'yearly' for policy pages.
 export const routes: readonly SitemapEntry[] = [
   { path: '/', changeFrequency: 'weekly', priority: 1.0 },
+  { path: '/enrollment', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/enrollment-process', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/about-us', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/curriculum', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/class-schedules', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/tuition', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/scholarship-information', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/calendar', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/contact', changeFrequency: 'monthly', priority: 0.8 },
+  { path: '/volunteering', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/health-policy', changeFrequency: 'yearly', priority: 0.5 },
+  { path: '/employment', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/documents-links', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/photo-gallery', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/school-supply-lists', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/privacy-policy', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/cookie-policy', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/terms-of-service', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/donation-policy', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/free-for-charity-donation-policy', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/vulnerability-disclosure-policy', changeFrequency: 'yearly', priority: 0.2 },
-  { path: '/security-acknowledgements', changeFrequency: 'monthly', priority: 0.2 },
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

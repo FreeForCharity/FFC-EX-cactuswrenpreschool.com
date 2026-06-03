@@ -2,15 +2,18 @@
 @import 'tailwindcss';
 
 :root {
-  /* Brand tokens */
-  --ffc-primary: #2a6682;
-  --ffc-accent: #f58629;
-  --ffc-yellow: #f5c045;
-  --ffc-black: #000000;
+  /* Cactus Wren brand tokens — warm desert + sky, child-friendly */
+  --ffc-primary: #2f7da3; /* sky teal */
+  --ffc-primary-dark: #225d79;
+  --ffc-accent: #e8833a; /* marigold orange */
+  --ffc-green: #6aa84f; /* cactus green */
+  --ffc-yellow: #f4b740; /* sunny */
+  --ffc-cream: #fff8ef; /* soft paper */
+  --ffc-black: #1f2937;
   --ffc-white: #ffffff;
 
   /* Layout */
-  --ffc-container: 1248px;
+  --ffc-container: 1200px;
   --ffc-radius-xl: 20px;
 }
 
@@ -22,8 +25,11 @@ body {
 @theme inline {
   /* Tailwind design tokens mapped to brand variables */
   --color-primary: var(--ffc-primary);
+  --color-primary-dark: var(--ffc-primary-dark);
   --color-accent: var(--ffc-accent);
+  --color-green: var(--ffc-green);
   --color-yellow: var(--ffc-yellow);
+  --color-cream: var(--ffc-cream);
   --color-ink: var(--ffc-black);
   --color-paper: var(--ffc-white);
 
@@ -37,9 +43,33 @@ body {
 }
 
 body {
-  font-family: var(--font-faustina), serif !important;
+  font-family: var(--font-open-sans), system-ui, sans-serif !important;
   background: var(--color-paper);
   color: var(--color-ink);
+}
+
+/* Cactus Wren heading + helper utilities */
+.cw-heading {
+  font-family: var(--font-raleway), sans-serif;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.cw-display {
+  font-family: var(--font-montserrat), sans-serif;
+  font-weight: 700;
+}
+.cw-prose p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+}
+.cw-prose a {
+  color: var(--color-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.cw-prose a:hover {
+  color: var(--color-accent);
 }
 #header {
   font-family: var(--font-open-sans), sans-serif !important;

@@ -2,10 +2,9 @@ import type { Metadata } from 'next'
 import './globals.css'
 import Header from './../components/header'
 import Footer from './../components/footer'
-import CookieConsent from './../components/cookie-consent'
-import GoogleTagManager, { GoogleTagManagerNoScript } from './../components/google-tag-manager'
 import { siteConfig, siteUrl, twitterSite, cardDescription } from '@/lib/site.config'
 import { assetPath } from '@/lib/assetPath'
+import { img } from '@/lib/cw'
 import {
   openSans,
   lato,
@@ -49,9 +48,9 @@ export const metadata: Metadata = {
     description: cardDescription(),
     images: [
       {
-        url: assetPath('/web-app-manifest-512x512.png'),
-        width: 512,
-        height: 512,
+        url: assetPath(img.logo),
+        width: 600,
+        height: 391,
         alt: siteConfig.name,
       },
     ],
@@ -61,7 +60,7 @@ export const metadata: Metadata = {
     site: twitterSite(),
     title: defaultTitle,
     description: cardDescription(),
-    images: [assetPath('/web-app-manifest-512x512.png')],
+    images: [assetPath(img.logo)],
   },
   icons: {
     icon: [
@@ -70,9 +69,8 @@ export const metadata: Metadata = {
     ],
     apple: [{ url: assetPath('/apple-icon.png'), sizes: '180x180', type: 'image/png' }],
   },
-  // Manifest is generated dynamically from siteConfig via src/app/manifest.ts;
-  // Next.js auto-wires the <link rel="manifest"> tag, so we don't set it here.
 }
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -82,39 +80,16 @@ export default function RootLayout({
     <html lang="en">
       <head>
         {/* Baseline CSP for hosts that cannot serve _headers (GitHub Pages).
-            Note: frame-ancestors, sandbox, and report-uri are IGNORED by the
-            browser when delivered via <meta http-equiv> per the CSP spec.
-            GitHub Pages also does NOT set X-Frame-Options by default, so
-            clickjacking defense is not available on a Pages-only deploy.
-            Production sites should sit behind Cloudflare/Netlify so the
-            frame-ancestors directive in public/_headers takes effect.
-            Keep the rest of this list aligned with public/_headers —
-            third-party origins must be added to BOTH. */}
+            This site is fully self-hosted, so the policy is origin-only.
+            Keep this aligned with public/_headers — the drift checker
+            enforces that the two stay in lockstep on shared directives. */}
         <meta
           httpEquiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com https://www.clarity.ms https://*.clarity.ms https://widgets.guidestar.org https://connect.facebook.net https://www.zeffy.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https:; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://stats.g.doubleclick.net https://www.googletagmanager.com https://www.clarity.ms https://*.clarity.ms; frame-src https://www.googletagmanager.com https://www.zeffy.com https://widgets.guidestar.org https://www.facebook.com https://forms.office.com https://forms.microsoft.com https://www.youtube.com https://www.youtube-nocookie.com https://widgets.sociablekit.com; media-src 'self' blob: https:; object-src 'none'; base-uri 'self'; form-action 'self' https://www.zeffy.com https://forms.office.com; upgrade-insecure-requests"
+          content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self'; frame-src 'none'; media-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self' mailto:; upgrade-insecure-requests"
         />
         <meta name="referrer" content="strict-origin-when-cross-origin" />
         <meta name="color-scheme" content="light" />
         <meta name="theme-color" content={siteConfig.themeColor} />
-
-        {/* Preconnect to external domains for faster resource loading */}
-        <link rel="preconnect" href="https://www.googletagmanager.com" />
-        <link rel="preconnect" href="https://www.zeffy.com" />
-        <link rel="preconnect" href="https://widgets.guidestar.org" />
-        <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
-        <link rel="dns-prefetch" href="https://www.zeffy.com" />
-        <link rel="dns-prefetch" href="https://www.idealist.org" />
-
-        {/* Preload critical LCP image */}
-        <link
-          rel="preload"
-          as="image"
-          href={assetPath('/Images/figma-hero-img.webp')}
-          fetchPriority="high"
-        />
-
-        <GoogleTagManager />
       </head>
       <body
         className={[
@@ -130,21 +105,14 @@ export default function RootLayout({
         ].join(' ')}
         suppressHydrationWarning={true}
       >
-        <GoogleTagManagerNoScript />
         {/* Skip-to-content link (WCAG 2.4.1). First focusable element in the
-            body so keyboard users tabbing in can jump past the header
-            navigation. Visually hidden until focused — see .skip-to-content
-            styles in src/app/globals.css. */}
+            body so keyboard users tabbing in can jump past the header nav. */}
         <a href="#main-content" className="skip-to-content">
           Skip to main content
         </a>
-        {/* <PopupProvider> */}
         <Header />
         <main id="main-content">{children}</main>
         <Footer />
-        <CookieConsent />
-        {/* <PopupsRootClient /> */}
-        {/* </PopupProvider> */}
       </body>
     </html>
   )

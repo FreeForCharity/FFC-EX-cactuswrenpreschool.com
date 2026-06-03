@@ -1,10 +1,11 @@
 import React from 'react'
 import { siteConfig, siteUrl } from '@/lib/site.config'
 import { assetPath } from '@/lib/assetPath'
+import { contact, img } from '@/lib/cw'
 
 /**
- * Builds the schema.org NGO JSON-LD object for this site. Pulls every value
- * from `siteConfig` so a fork only edits one file. Exported separately so
+ * Builds the schema.org Preschool JSON-LD object for this site. Pulls values
+ * from `siteConfig` and the Cactus Wren contact model. Exported separately so
  * it can be asserted in unit tests without rendering.
  */
 export function buildOrganizationSchema(): Record<string, unknown> {
@@ -12,19 +13,26 @@ export function buildOrganizationSchema(): Record<string, unknown> {
 
   const schema: Record<string, unknown> = {
     '@context': 'https://schema.org',
-    '@type': 'NGO',
+    '@type': 'Preschool',
     name: siteConfig.name,
     description: siteConfig.description,
     url: siteUrl('/'),
-    logo: siteUrl(assetPath('/web-app-manifest-512x512.png')),
+    logo: siteUrl(assetPath(img.logo)),
+    telephone: contact.phone,
+    email: siteConfig.contactEmail,
+    foundingDate: '1979',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: contact.street,
+      addressLocality: contact.city,
+      addressRegion: contact.state,
+      postalCode: contact.zip,
+      addressCountry: 'US',
+    },
   }
 
   if (sameAs.length > 0) {
     schema.sameAs = sameAs
-  }
-
-  if (siteConfig.contactEmail) {
-    schema.email = siteConfig.contactEmail
   }
 
   return schema
