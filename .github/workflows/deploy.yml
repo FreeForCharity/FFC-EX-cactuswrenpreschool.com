@@ -43,6 +43,11 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
         with:
+          # Auto-enable GitHub Pages (build type: GitHub Actions) on the first
+          # run so a brand-new repo deploys without a manual Settings -> Pages
+          # toggle. Requires the workflow's `pages: write` permission (granted
+          # below). Harmless once Pages is already enabled.
+          enablement: true
           # Automatically inject basePath in your Next.js configuration file and disable
           # server side image optimization (https://nextjs.org/docs/api-reference/next/image#unoptimized).
           static_site_generator: next

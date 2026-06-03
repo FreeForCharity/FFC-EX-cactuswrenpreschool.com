@@ -6,11 +6,11 @@ import OrganizationSchema, {
 import { siteConfig } from '../../../src/lib/site.config'
 
 describe('OrganizationSchema', () => {
-  it('builds a schema.org NGO object with values from siteConfig', () => {
+  it('builds a schema.org Preschool object with values from siteConfig', () => {
     const schema = buildOrganizationSchema()
 
     expect(schema['@context']).toBe('https://schema.org')
-    expect(schema['@type']).toBe('NGO')
+    expect(schema['@type']).toBe('Preschool')
     expect(schema.name).toBe(siteConfig.name)
     expect(schema.description).toBe(siteConfig.description)
 
@@ -42,6 +42,6 @@ describe('OrganizationSchema', () => {
     expect(text.length).toBeGreaterThan(0)
     const parsed = JSON.parse(text) as Record<string, unknown>
     expect(parsed.name).toBe(siteConfig.name)
-    expect(parsed['@type']).toBe('NGO')
+    expect(parsed['@type']).toBe('Preschool')
   })
 })

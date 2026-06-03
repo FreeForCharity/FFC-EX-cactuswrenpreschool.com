@@ -15,29 +15,26 @@ export default function NotFound() {
       aria-labelledby="not-found-heading"
     >
       <div className="w-[90%] md:w-[80%] mx-auto text-center">
-        <p className="text-[14px] font-semibold tracking-widest text-[#0073e6] uppercase">404</p>
-        <h1
-          id="not-found-heading"
-          className="mt-4 text-[34px] md:text-[42px] font-bold text-[#333]"
-        >
+        <p className="text-[14px] font-semibold tracking-widest text-accent uppercase">404</p>
+        <h1 id="not-found-heading" className="mt-4 text-[34px] md:text-[42px] font-bold text-ink">
           We can&apos;t find that page
         </h1>
-        <p className="mt-6 text-[16px] leading-[26px] text-[#666] max-w-[560px] mx-auto">
+        <p className="mt-6 text-[16px] leading-[26px] text-ink/70 max-w-[560px] mx-auto">
           The link you followed may be broken, or the page may have been moved. Head back to the
           homepage to keep exploring {siteConfig.name}.
         </p>
         <div className="mt-10 flex items-center justify-center gap-4 flex-wrap">
           <Link
             href="/"
-            className="inline-flex items-center justify-center bg-[#0073e6] hover:bg-[#005BB7] text-white px-6 py-3 text-[16px] font-semibold transition-colors"
+            className="inline-flex items-center justify-center rounded-full bg-primary hover:bg-primary-dark text-white px-6 py-3 text-[16px] font-semibold transition-colors"
           >
             Go to homepage
           </Link>
           <Link
-            href={siteConfig.vulnerabilityDisclosurePath}
-            className="inline-flex items-center justify-center border border-[#0073e6] text-[#0073e6] hover:bg-[#0073e6] hover:text-white px-6 py-3 text-[16px] font-semibold transition-colors"
+            href="/contact"
+            className="inline-flex items-center justify-center rounded-full border-2 border-primary text-primary hover:bg-primary hover:text-white px-6 py-3 text-[16px] font-semibold transition-colors"
           >
-            Report an issue
+            Contact us
           </Link>
         </div>
       </div>

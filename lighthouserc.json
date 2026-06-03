@@ -4,9 +4,9 @@
       "staticDistDir": "./out",
       "url": [
         "http://localhost/index.html",
-        "http://localhost/cookie-policy.html",
-        "http://localhost/privacy-policy.html",
-        "http://localhost/terms-of-service.html"
+        "http://localhost/about-us.html",
+        "http://localhost/enrollment.html",
+        "http://localhost/privacy-policy.html"
       ],
       "numberOfRuns": 3
     },

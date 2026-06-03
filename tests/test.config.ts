@@ -74,10 +74,8 @@ export const testConfig = {
    * Used in: tests/copyright.spec.ts
    */
   copyright: {
-    text: 'All Rights Are Reserved by Free For Charity a US 501c3 Non Profit',
-    searchText: 'All Rights Are Reserved',
-    linkUrl: 'https://freeforcharity.org',
-    linkText: 'https://freeforcharity.org',
+    text: 'Cactus Wren Cooperative Preschool. All rights reserved.',
+    searchText: 'All rights reserved',
   },
 
   /**
@@ -110,9 +108,9 @@ export const testConfig = {
    * Used in: tests/logo.spec.ts
    */
   logo: {
-    headerAlt: 'Free For Charity',
-    heroAlt: 'Hero image',
-    navBarAriaLabel: 'Free For Charity home',
+    headerAlt: 'Cactus Wren Cooperative Preschool logo',
+    heroAlt: 'Children learning through play at Cactus Wren Cooperative Preschool',
+    navBarAriaLabel: 'Cactus Wren Preschool home',
   },
 
   /**

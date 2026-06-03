@@ -11,20 +11,17 @@ import { test, expect } from '@playwright/test'
  */
 
 test.describe('head metadata and security claims', () => {
-  test('CSP meta tag exists and includes the third-party origins the site uses', async ({
-    page,
-  }) => {
+  test('CSP meta tag exists and enforces an origin-only baseline policy', async ({ page }) => {
     await page.goto('/')
     const csp = await page
       .locator('meta[http-equiv="Content-Security-Policy"]')
       .getAttribute('content')
     expect(csp).toBeTruthy()
-    expect(csp).toContain('default-src')
-    expect(csp).toContain('https://www.googletagmanager.com') // GTM
-    expect(csp).toContain('https://www.clarity.ms') // Microsoft Clarity
-    expect(csp).toContain('https://widgets.sociablekit.com') // Facebook events widget
-    expect(csp).toContain('https://forms.office.com') // Microsoft Forms iframe
-    expect(csp).toContain('object-src')
+    // This site is fully self-hosted — the policy locks everything to the origin.
+    expect(csp).toContain("default-src 'self'")
+    expect(csp).toContain("object-src 'none'")
+    expect(csp).toContain("base-uri 'self'")
+    expect(csp).toContain('upgrade-insecure-requests')
     // frame-ancestors is intentionally omitted from the meta CSP (browsers
     // ignore it there per spec). It lives in public/_headers only.
     expect(csp).not.toContain('frame-ancestors')
