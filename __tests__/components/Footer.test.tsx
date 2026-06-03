@@ -24,7 +24,15 @@ describe('Footer component', () => {
   it('should have a Facebook link', () => {
     render(<Footer />)
     const links = screen.getAllByRole('link')
-    const fb = links.find((l) => l.getAttribute('href')?.includes('facebook.com'))
+    const fb = links.find((l) => {
+      const href = l.getAttribute('href')
+      if (!href) return false
+      try {
+        return new URL(href).hostname === 'www.facebook.com'
+      } catch {
+        return false
+      }
+    })
     expect(fb).toBeDefined()
   })
 
