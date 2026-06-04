@@ -69,6 +69,10 @@ export const img = {
   classroom5: `${IMG}/457f82_97b8617813e3466ba819681e0255cac2.png`,
   classroomWide: `${IMG}/f61af8_6458afc5e68c443f99b27457361df8b0.png`,
   outdoor: `${IMG}/nsplsh_334d75306951674c51746f_d_6000_4000_s_4_2.jpg`,
+  // Hero slideshow photos (genuine school photos from the Photo Gallery)
+  heroScience: `${IMG}/457f82_84c1d1756edc4f1da26530e549004ba9.jpg`,
+  heroGroup: `${IMG}/457f82_1baa9dafc2b5410d9003b192bb357880.jpg`,
+  heroRug: `${IMG}/457f82_6a92f12db598447086b8884ae4f18847.jpg`,
 } as const
 
 /** Photos that make up the gallery / virtual tour. */
@@ -80,6 +84,30 @@ export const galleryPhotos = [
   img.classroom4,
   img.classroom5,
   img.outdoor,
+  // Additional genuine school photos migrated from the live Wix Photo Gallery & School Tour page.
+  `${IMG}/457f82_c922c27aef7e4b8a9629df9c84b0ab42.png`,
+  `${IMG}/457f82_84c1d1756edc4f1da26530e549004ba9.jpg`,
+  `${IMG}/457f82_a2414b9a00d8450caea1e45756368feb.jpg`,
+  `${IMG}/457f82_6a92f12db598447086b8884ae4f18847.jpg`,
+  `${IMG}/457f82_5b887843186140458d77348945ec5865.jpg`,
+  `${IMG}/457f82_b8e10ede3d3c4fab86797aa896dd947a.jpg`,
+  `${IMG}/457f82_1baa9dafc2b5410d9003b192bb357880.jpg`,
+  `${IMG}/457f82_152743dc2d2e4d6e8cf685f2500fe8f9.jpg`,
+  `${IMG}/457f82_36b59e23431f43d5a0f5b78d5f731cfc.jpg`,
+  `${IMG}/457f82_01244fa6000d4fa898621d7307b65c15.jpg`,
+  `${IMG}/457f82_f15eb6e098ba4c35afc1577a1c1b4a65.jpg`,
+  `${IMG}/457f82_03eae95171c14d0bb145648e43aa83e0.jpg`,
+  `${IMG}/457f82_1335ea57dd3f48fe9af7c3748e38ef7e.jpg`,
+  `${IMG}/457f82_4cfce13d1a904ee992f9ce3492380c0b.png`,
+  `${IMG}/457f82_6a751391f6284b0a8b49e45f43da8ca0.jpg`,
+  `${IMG}/457f82_e9314e65905d4affbef85e52fd4ca540.jpg`,
+  `${IMG}/457f82_4dbb5a1fd67c472d8c1cbd7b5dfb8770.jpg`,
+  `${IMG}/457f82_f0ef511ffb624d60baabc304ac7edd92.jpg`,
+  `${IMG}/457f82_063ad0ffecf64c07a4a11547f9049741.png`,
+  `${IMG}/457f82_b9ef32332d9e41b187c12c31bc20ba88.jpg`,
+  `${IMG}/457f82_37a56eef05c545608c031d1b82523c60.jpg`,
+  `${IMG}/457f82_cbb93b9e1fe64476b560040029a55cea.jpg`,
+  `${IMG}/457f82_171ff9e9c6384b9786c77808e495132e.jpg`,
 ]
 
 export type Person = {
