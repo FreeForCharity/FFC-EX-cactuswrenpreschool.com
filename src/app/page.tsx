@@ -5,10 +5,25 @@ import { FiArrowRight, FiCheckCircle } from 'react-icons/fi'
 import OrganizationSchema from '@/components/seo/OrganizationSchema'
 import Section from '@/components/ui/Section'
 import Button from '@/components/ui/Button'
+import HeroCarousel from '@/components/ui/HeroCarousel'
 import { assetPath } from '@/lib/assetPath'
 import { contact, img } from '@/lib/cw'
 
 const values = ['Quality', 'Positivity', 'Integrity', 'Teamwork', 'Stewardship', 'Professionalism']
+
+const heroSlides = [
+  {
+    src: img.heroScience,
+    alt: 'Preschoolers exploring a hands-on science activity at Cactus Wren',
+  },
+  { src: img.heroGroup, alt: 'A Cactus Wren class gathered on the rug with their teacher' },
+  {
+    src: img.classroom2,
+    alt: 'Children learning through play at Cactus Wren Cooperative Preschool',
+  },
+  { src: img.heroRug, alt: 'A bright Cactus Wren classroom with an alphabet learning rug' },
+  { src: img.classroom1, alt: 'Hands-on learning materials in a Cactus Wren classroom' },
+]
 
 const programs = [
   {
@@ -74,16 +89,7 @@ const Home = () => {
             </div>
           </div>
           <div className="relative">
-            <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
-              <Image
-                src={assetPath(img.classroom2)}
-                alt="Children learning through play at Cactus Wren Cooperative Preschool"
-                fill
-                priority
-                sizes="(max-width: 1024px) 100vw, 600px"
-                className="object-cover"
-              />
-            </div>
+            <HeroCarousel slides={heroSlides} />
           </div>
         </div>
       </section>

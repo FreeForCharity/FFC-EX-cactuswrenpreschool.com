@@ -109,7 +109,7 @@ export const testConfig = {
    */
   logo: {
     headerAlt: 'Cactus Wren Cooperative Preschool logo',
-    heroAlt: 'Children learning through play at Cactus Wren Cooperative Preschool',
+    heroAlt: 'Preschoolers exploring a hands-on science activity at Cactus Wren',
     navBarAriaLabel: 'Cactus Wren Preschool home',
   },
 
