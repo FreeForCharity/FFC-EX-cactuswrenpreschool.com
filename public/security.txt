@@ -12,6 +12,6 @@
 Contact: mailto:cactuswrenpreschool@gmail.com
 Expires: 2027-01-01T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/.well-known/security.txt
-Canonical: https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/security.txt
-Policy: https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/privacy-policy
+Canonical: https://www.cactuswrenpreschool.com/.well-known/security.txt
+Canonical: https://www.cactuswrenpreschool.com/security.txt
+Policy: https://www.cactuswrenpreschool.com/privacy-policy
