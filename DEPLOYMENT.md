@@ -1,33 +1,71 @@
 # Deployment Guide
 
-This document explains how the Free For Charity website is deployed to GitHub Pages and provides troubleshooting guidance for deployment issues.
+This document explains how the **Cactus Wren Cooperative Preschool** website (built on the Free For Charity single-page template) is deployed to GitHub Pages, and provides troubleshooting guidance for deployment issues.
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Deployment Architecture](#deployment-architecture)
-3. [Automated Deployment](#automated-deployment)
-4. [Manual Deployment](#manual-deployment)
-5. [Domain Configuration](#domain-configuration)
-6. [Environment Variables](#environment-variables)
-7. [Troubleshooting](#troubleshooting)
-8. [Rollback Procedures](#rollback-procedures)
+2. [Current Deployment Status](#current-deployment-status)
+3. [Deployment Architecture](#deployment-architecture)
+4. [Automated Deployment](#automated-deployment)
+5. [Manual Deployment](#manual-deployment)
+6. [Domain Configuration](#domain-configuration)
+7. [DNS Cutover from Apex (Wix → GitHub Pages)](#dns-cutover-from-apex-wix--github-pages)
+8. [Environment Variables](#environment-variables)
+9. [Troubleshooting](#troubleshooting)
+10. [Rollback Procedures](#rollback-procedures)
 
 ---
 
 ## Overview
 
-The Free For Charity website is a static Next.js application deployed to GitHub Pages. The site is accessible at:
+The Cactus Wren Cooperative Preschool website is a static Next.js application deployed to GitHub Pages. It was migrated off Wix into the FFC template, and every asset (content, media, documents, fonts) is served locally so the site is fully decoupled from Wix.
 
-- **GitHub Pages URL**: https://freeforcharity.github.io/FFC_Single_Page_Template/
-- **Custom Domain**: https://ffcworkingsite1.org
+The site is currently live at:
+
+- **GitHub Pages URL (live now)**: https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
+- **Custom Domain (target — DNS not yet cut over)**: https://www.cactuswrenpreschool.com
+
+> **Note:** The custom domain `cactuswrenpreschool.com` still points at Wix. Until DNS is cut over (see [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages)), the production build serves from the GitHub Pages project URL above, under the `/FFC-EX-cactuswrenpreschool.com` subpath.
 
 ### Technology Stack
 
-- **Framework**: Next.js 16.0.7 with static export
-- **Hosting**: GitHub Pages
+- **Framework**: Next.js 16 with static export (`output: 'export'`)
+- **Hosting**: GitHub Pages (build type: GitHub Actions)
 - **CI/CD**: GitHub Actions
 - **Node.js**: Version 20.x
+
+---
+
+## Current Deployment Status
+
+_Last verified: 2026-07-09 against the live GitHub Pages deployment._
+
+The GitHub Pages deployment is **healthy and serving**. Feature verification against `https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/`:
+
+| Area                   | Status | Notes                                                                          |
+| ---------------------- | ------ | ------------------------------------------------------------------------------ |
+| Home page              | ✅     | HTTP 200                                                                       |
+| All 16 content routes  | ✅     | 17/17 pages return HTTP 200 (see route list below)                             |
+| PWA manifest + icons   | ✅     | `/manifest.webmanifest` valid; `android-chrome-{192,512}` icons resolve        |
+| SEO metadata           | ✅     | CSP `<meta>`, theme-color, Open Graph + Twitter cards, `<link rel="manifest">` |
+| `robots.txt` + sitemap | ✅     | `/robots.txt` references sitemap; `/sitemap.xml` lists URLs                    |
+| `security.txt`         | ✅     | Served at `/security.txt`; valid Contact + future Expires                      |
+| Branded 404            | ✅     | `404.html` returns HTTP 404 with the branded heading                           |
+| Favicons               | ✅     | `/favicon.ico`, `/icon.png` reachable                                          |
+| Security headers       | ✅     | `public/_headers` (Cloudflare/Netlify) + CSP `<meta>` (GitHub Pages)           |
+
+**Verified routes** (all HTTP 200, no trailing slash — Next.js static export emits `<route>.html`):
+
+`/` · `/about-us` · `/calendar` · `/class-schedules` · `/contact` · `/curriculum` · `/documents-links` · `/employment` · `/enrollment` · `/enrollment-process` · `/health-policy` · `/photo-gallery` · `/privacy-policy` · `/scholarship-information` · `/school-supply-lists` · `/tuition` · `/volunteering`
+
+Re-run this verification any time with the shipped smoke check:
+
+```bash
+npm run smoke -- https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
+```
+
+> **Known non-issue:** GitHub Pages can serve a freshly deployed asset (manifest icons, favicons) as `404` for a few seconds on some edge nodes _immediately_ after `deploy-pages` returns, while the already-cached home page serves `200`. The post-deploy smoke check now retries `404` on those asset checks within its deadline so this CDN propagation lag no longer marks the deploy as failed. This was the root cause of the recurring "Production deployment failed" incidents.
 
 ---
 
@@ -52,7 +90,7 @@ This generates a static site in the `./out` directory that can be served by any 
 
 The site uses the `assetPath()` helper function (located in `src/lib/assetPath.ts`) to handle assets correctly for both:
 
-1. **GitHub Pages subpath deployment**: `/FFC_Single_Page_Template/`
+1. **GitHub Pages subpath deployment**: `/FFC-EX-cactuswrenpreschool.com/`
 2. **Custom domain deployment**: Root path `/`
 
 The helper uses the `NEXT_PUBLIC_BASE_PATH` environment variable to determine the correct asset path.
@@ -104,18 +142,27 @@ The actual steps performed by the deploy workflow are:
 3. **Setup Pages**: Configures GitHub Pages settings
 4. **Restore Next.js cache**: Restores build cache for faster builds
 5. **Install dependencies**: Runs `npm ci` for a clean installation
-6. **Build site**: Runs `next build` with basePath for GitHub Pages
-7. **Upload artifact**: Packages the `./out` directory
-8. **Deploy to GitHub Pages**: Publishes the site to GitHub Pages (separate job)
+6. **Determine base path**: Auto-derives `NEXT_PUBLIC_BASE_PATH` from whether `public/CNAME` exists (see below)
+7. **Build site**: Runs `next build` with the derived basePath
+8. **Upload artifact**: Packages the `./out` directory
+9. **Deploy to GitHub Pages**: Publishes the site (separate job)
+10. **Post-deploy smoke check**: Runs `scripts/smoke-check.mjs` against the live URL
 
-#### Environment Variables in CI
+#### Base Path is Auto-Derived (no manual env var)
 
-```yaml
-env:
-  NEXT_PUBLIC_BASE_PATH: /FFC_Single_Page_Template
+The deploy workflow no longer hard-codes `NEXT_PUBLIC_BASE_PATH`. Its **Determine base path** step picks the correct value automatically:
+
+```bash
+if [ -s "public/CNAME" ]; then
+  # Custom domain present → serve from origin root (empty basePath)
+  NEXT_PUBLIC_BASE_PATH=""
+else
+  # No CNAME → github.io subpath deploy
+  NEXT_PUBLIC_BASE_PATH="/FFC-EX-cactuswrenpreschool.com"
+fi
 ```
 
-This ensures images and assets work correctly at the GitHub Pages subpath.
+Because there is **no `public/CNAME` yet**, the current build uses `NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com` so images and assets resolve correctly at the GitHub Pages subpath. Adding a `CNAME` during DNS cutover automatically flips the build to the empty root path — no workflow edit required.
 
 ### Viewing Deployment Status
 
@@ -141,8 +188,8 @@ While automated deployment is recommended, you can also deploy manually if neede
 1. **Clone the repository** (if not already done):
 
    ```bash
-   git clone https://github.com/FreeForCharity/FFC_Single_Page_Template.git
-   cd FFC_Single_Page_Template
+   git clone https://github.com/FreeForCharity/FFC-EX-cactuswrenpreschool.com.git
+   cd FFC-EX-cactuswrenpreschool.com
    ```
 
 2. **Install dependencies**:
@@ -159,10 +206,10 @@ While automated deployment is recommended, you can also deploy manually if neede
    npm run test:e2e
    ```
 
-4. **Build the site** with the correct base path:
+4. **Build the site** with the correct base path (matches the current no-CNAME subpath deploy):
 
    ```bash
-   NEXT_PUBLIC_BASE_PATH=/FFC_Single_Page_Template npm run build
+   NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com npm run build
    ```
 
 5. **Verify the build**:
@@ -195,39 +242,82 @@ The site will be built without a base path, making all assets available at the r
 
 ### GitHub Pages Configuration
 
+This repo deploys with the **GitHub Actions** build type (not "Deploy from a branch"). The `deploy.yml` workflow calls `actions/configure-pages` with `enablement: true`, so Pages is enabled automatically on first run — no manual Settings toggle is required. To confirm:
+
 1. **Go to repository Settings** → **Pages**
-2. **Source**: Select "Deploy from a branch"
-3. **Branch**: Select `gh-pages` or the branch created by the workflow
-4. **Folder**: Select `/ (root)`
+2. **Source**: should read **"GitHub Actions"**
+
+There is no `gh-pages` branch; the built `./out` directory is uploaded as a Pages artifact and published directly.
 
 ### Custom Domain Setup
 
-If using a custom domain:
+The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS still points at Wix. When you are ready to connect it, follow the [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages) runbook below, which covers the `public/CNAME` file, the DNS records, and the basePath flip in one ordered checklist.
 
-1. **Add a CNAME file** to the `public` directory with your domain:
+Quick reference for the CNAME file (added during cutover):
 
+```
+www.cactuswrenpreschool.com
+```
+
+Once `public/CNAME` exists, the **Determine base path** step builds with an empty `NEXT_PUBLIC_BASE_PATH` automatically — no other change needed.
+
+---
+
+## DNS Cutover from Apex (Wix → GitHub Pages)
+
+The site is fully built and verified on GitHub Pages, but the domain `cactuswrenpreschool.com` still resolves to **Wix** (apex `A` records in the `185.230.63.x` range, `www` served by Wix). This section is the ordered runbook for moving the domain to the GitHub Pages deployment.
+
+### Pre-cutover checklist (do these first)
+
+- [x] Site content migrated off Wix and served locally (no Wix dependencies).
+- [x] All routes verified live on Pages — see [Current Deployment Status](#current-deployment-status).
+- [x] PWA manifest, `security.txt`, `robots.txt`, `sitemap.xml`, favicons, and security headers verified.
+- [x] Post-deploy smoke check tolerant of CDN propagation lag (deploys go green).
+- [ ] Confirm you have access to the DNS zone for `cactuswrenpreschool.com` (registrar or Cloudflare).
+- [ ] Decide the canonical host — this template targets **`www.cactuswrenpreschool.com`** with an apex redirect.
+
+### Cutover steps
+
+1. **Add the `CNAME` file** to the repo so GitHub Pages claims the domain and the build switches to the root base path:
+
+   ```bash
+   echo "www.cactuswrenpreschool.com" > public/CNAME
+   git add public/CNAME
+   git commit -m "chore: add CNAME for cactuswrenpreschool.com cutover"
    ```
-   ffcworkingsite1.org
+
+   Merging this to `main` triggers a deploy that builds with an empty `NEXT_PUBLIC_BASE_PATH` (root paths), and GitHub registers the custom domain.
+
+2. **Update `src/lib/site.config.ts`** `url` from `https://freeforcharity.github.io` to `https://www.cactuswrenpreschool.com` so canonical URLs, `sitemap.xml`, `robots.txt`, and `security.txt` emit the production domain. (The drift check requires the bare origin with no path component.)
+
+3. **Set DNS records** at the domain's DNS provider:
+
+   | Type    | Name  | Value                                                     |
+   | ------- | ----- | --------------------------------------------------------- |
+   | `CNAME` | `www` | `freeforcharity.github.io`                                |
+   | `A`     | `@`   | `185.199.108.153`                                         |
+   | `A`     | `@`   | `185.199.109.153`                                         |
+   | `A`     | `@`   | `185.199.110.153`                                         |
+   | `A`     | `@`   | `185.199.111.153`                                         |
+   | `AAAA`  | `@`   | `2606:50c0:8000::153` (+ `8001`, `8002`, `8003` variants) |
+
+   These are GitHub Pages' apex IPs. **Remove the existing Wix `A`/`ALIAS` records** (`185.230.63.x`) for the apex and `www` in the same change.
+
+4. **Set the custom domain in GitHub** → Settings → Pages → Custom domain: `www.cactuswrenpreschool.com`, then wait for the DNS check to pass and **enable "Enforce HTTPS"** (GitHub provisions the Let's Encrypt certificate automatically once DNS resolves).
+
+5. **Verify** after propagation (can take up to 24–48h, usually much less):
+
+   ```bash
+   dig +short www.cactuswrenpreschool.com   # → freeforcharity.github.io CNAME chain
+   dig +short cactuswrenpreschool.com        # → the four 185.199.x GitHub apex IPs
+   npm run smoke -- https://www.cactuswrenpreschool.com/
    ```
 
-2. **Configure DNS records** at your domain provider:
-   - **Type**: CNAME
-   - **Name**: www (or @)
-   - **Value**: freeforcharity.github.io
+   All smoke checks should pass, and asset/icon URLs should now be root-relative (no `/FFC-EX-cactuswrenpreschool.com` prefix).
 
-3. **Enable HTTPS** in GitHub Pages settings (automatic with custom domain)
+### Rollback
 
-4. **Update environment variables** if needed:
-   - Remove or leave empty `NEXT_PUBLIC_BASE_PATH` for custom domains
-   - GitHub Actions should detect custom domain and adjust automatically
-
-### DNS Propagation
-
-After configuring DNS:
-
-- Changes can take 24-48 hours to propagate
-- Use `dig` or online DNS tools to verify propagation
-- Clear browser cache when testing
+If anything is wrong after cutover, restore the previous Wix `A`/`ALIAS` records at the DNS provider (DNS change only — no code change needed). The GitHub Pages deployment stays live at `https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` regardless, so there is no downtime window on the Pages side.
 
 ---
 
@@ -246,14 +336,16 @@ These variables are embedded during the build process:
 
 ### Setting Environment Variables in GitHub Actions
 
-Environment variables are set in the workflow file:
+`NEXT_PUBLIC_BASE_PATH` is **derived automatically** by the workflow's _Determine base path_ step (see [Base Path is Auto-Derived](#base-path-is-auto-derived-no-manual-env-var)) and passed to the build:
 
 ```yaml
 - name: Build with Next.js
   run: npm run build
   env:
-    NEXT_PUBLIC_BASE_PATH: /FFC_Single_Page_Template
+    NEXT_PUBLIC_BASE_PATH: ${{ steps.basepath.outputs.value }}
 ```
+
+The other `NEXT_PUBLIC_*` analytics variables would be set as repository or environment secrets if enabled; none are required for the site to build or deploy.
 
 ### Local Development
 
@@ -365,12 +457,12 @@ To test the built site locally before deploying:
 
 ```bash
 # Build with GitHub Pages configuration
-NEXT_PUBLIC_BASE_PATH=/FFC_Single_Page_Template npm run build
+NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com npm run build
 
 # Serve the built site
 npm run preview
 
-# Open http://localhost:3000/FFC_Single_Page_Template in your browser
+# Open http://localhost:3000/FFC-EX-cactuswrenpreschool.com in your browser
 ```
 
 This simulates how the site will behave on GitHub Pages.
