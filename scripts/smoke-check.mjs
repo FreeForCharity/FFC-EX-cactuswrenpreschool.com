@@ -69,7 +69,9 @@ async function fetchWithRetry(pathOrUrl, { retryOn404 = false } = {}) {
         lastErr = `HTTP ${res.status}`
         // Cancel the unread body so undici releases the socket back to the
         // pool before we sleep, instead of holding it open until GC.
-        await res.body?.cancel().catch(() => {})
+        if (res.body) {
+          await res.body.cancel().catch(() => {})
+        }
         await sleep(RETRY_DELAY_MS)
         continue
       }
