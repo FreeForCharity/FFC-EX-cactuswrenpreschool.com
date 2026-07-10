@@ -38,7 +38,14 @@ const REQUEST_TIMEOUT_MS = 15 * 1000
 const RETRY_DELAY_MS = 5 * 1000
 const deadline = Date.now() + TOTAL_DEADLINE_MS
 
-async function fetchWithRetry(path) {
+// `retryOn404` lets callers treat a 404 as transient. Freshly deployed
+// static assets (manifest icons, favicons) can 404 on some GitHub Pages
+// edge nodes for a few seconds after `deploy-pages` returns, while the
+// already-cached home page serves 200. Retrying within the deadline
+// absorbs that propagation lag instead of failing the whole deploy — the
+// root cause of the recurring "Production deployment failed" incidents.
+// Route/page checks leave this false so a genuine missing page still fails.
+async function fetchWithRetry(path, { retryOn404 = false } = {}) {
   const url = `${BASE}${path}`
   let lastErr = null
   for (let attempt = 1; Date.now() < deadline; attempt++) {
@@ -51,8 +58,9 @@ async function fetchWithRetry(path) {
         headers: { 'User-Agent': 'ffc-smoke-check' },
       })
       clearTimeout(timer)
-      // Only retry on 5xx or transient. 4xx is a real failure.
-      if (res.status >= 500 || res.status === 429) {
+      // Retry on 5xx / 429 always, and on 404 only when the caller opts in
+      // for a freshly deployed asset still propagating across the CDN.
+      if (res.status >= 500 || res.status === 429 || (retryOn404 && res.status === 404)) {
         lastErr = `HTTP ${res.status}`
         await sleep(RETRY_DELAY_MS)
         continue
@@ -79,9 +87,9 @@ function record(name, ok, detail = '') {
   console.log(line)
 }
 
-async function expect200(path, name = path) {
+async function expect200(path, name = path, opts = {}) {
   try {
-    const res = await fetchWithRetry(path)
+    const res = await fetchWithRetry(path, opts)
     record(name, res.status === 200, `HTTP ${res.status}`)
     return res
   } catch (err) {
@@ -202,7 +210,8 @@ async function smoke() {
               ? icon.src
               : `/${icon.src}`
           const iconPath = iconUrl.startsWith('http') ? iconUrl.replace(BASE, '') : iconUrl
-          const r = await fetchWithRetry(iconPath).catch(() => null)
+          // Freshly deployed asset — tolerate CDN propagation lag (see #17).
+          const r = await fetchWithRetry(iconPath, { retryOn404: true }).catch(() => null)
           const ok = r && r.status === 200
           record(`manifest icon ${icon.src} resolves`, ok, r ? `HTTP ${r.status}` : 'fetch failed')
         }
@@ -227,9 +236,10 @@ async function smoke() {
     )
   }
 
-  // 6. Favicon + icon are reachable.
-  await expect200('/favicon.ico')
-  await expect200('/icon.png')
+  // 6. Favicon + icon are reachable. Freshly deployed assets — tolerate
+  // CDN propagation lag (see #17).
+  await expect200('/favicon.ico', '/favicon.ico', { retryOn404: true })
+  await expect200('/icon.png', '/icon.png', { retryOn404: true })
 
   // 7. Summary.
   const failed = results.filter((r) => !r.ok)
