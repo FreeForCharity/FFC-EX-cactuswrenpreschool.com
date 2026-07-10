@@ -67,6 +67,9 @@ async function fetchWithRetry(pathOrUrl, { retryOn404 = false } = {}) {
       // for a freshly deployed asset still propagating across the CDN.
       if (res.status >= 500 || res.status === 429 || (retryOn404 && res.status === 404)) {
         lastErr = `HTTP ${res.status}`
+        // Cancel the unread body so undici releases the socket back to the
+        // pool before we sleep, instead of holding it open until GC.
+        await res.body?.cancel().catch(() => {})
         await sleep(RETRY_DELAY_MS)
         continue
       }

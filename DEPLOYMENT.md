@@ -157,8 +157,11 @@ if [ -s "public/CNAME" ]; then
   # Custom domain present → serve from origin root (empty basePath)
   NEXT_PUBLIC_BASE_PATH=""
 else
-  # No CNAME → github.io subpath deploy
-  NEXT_PUBLIC_BASE_PATH="/FFC-EX-cactuswrenpreschool.com"
+  # No CNAME → github.io subpath deploy, derived from the repo name
+  # (GITHUB_REPOSITORY is "owner/repo"; strip the owner). For this repo
+  # that resolves to /FFC-EX-cactuswrenpreschool.com.
+  REPO_NAME="${GITHUB_REPOSITORY#*/}"
+  NEXT_PUBLIC_BASE_PATH="/$REPO_NAME"
 fi
 ```
 
