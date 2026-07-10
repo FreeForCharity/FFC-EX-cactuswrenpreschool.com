@@ -38,8 +38,20 @@ const REQUEST_TIMEOUT_MS = 15 * 1000
 const RETRY_DELAY_MS = 5 * 1000
 const deadline = Date.now() + TOTAL_DEADLINE_MS
 
-async function fetchWithRetry(path) {
-  const url = `${BASE}${path}`
+// `retryOn404` lets callers treat a 404 as transient. Freshly deployed
+// static assets (manifest icons, favicons) can 404 on some GitHub Pages
+// edge nodes for a few seconds after `deploy-pages` returns, while the
+// already-cached home page serves 200. Retrying within the deadline
+// absorbs that propagation lag instead of failing the deploy. (This is
+// complementary defense; the main cause of the recurring prod-deploy
+// incidents was a deterministic double-prefixed icon URL, fixed in the
+// manifest icon check below.) Route/page checks leave this false so a
+// genuine missing page still fails.
+async function fetchWithRetry(pathOrUrl, { retryOn404 = false } = {}) {
+  // Accept either a site-absolute path (prefixed with BASE) or an already
+  // absolute http(s) URL. Prefixing BASE onto a path that already contains
+  // the deploy base path would double it and 404 deterministically.
+  const url = /^https?:\/\//i.test(pathOrUrl) ? pathOrUrl : `${BASE}${pathOrUrl}`
   let lastErr = null
   for (let attempt = 1; Date.now() < deadline; attempt++) {
     const controller = new AbortController()
@@ -51,9 +63,15 @@ async function fetchWithRetry(path) {
         headers: { 'User-Agent': 'ffc-smoke-check' },
       })
       clearTimeout(timer)
-      // Only retry on 5xx or transient. 4xx is a real failure.
-      if (res.status >= 500 || res.status === 429) {
+      // Retry on 5xx / 429 always, and on 404 only when the caller opts in
+      // for a freshly deployed asset still propagating across the CDN.
+      if (res.status >= 500 || res.status === 429 || (retryOn404 && res.status === 404)) {
         lastErr = `HTTP ${res.status}`
+        // Cancel the unread body so undici releases the socket back to the
+        // pool before we sleep, instead of holding it open until GC.
+        if (res.body) {
+          await res.body.cancel().catch(() => {})
+        }
         await sleep(RETRY_DELAY_MS)
         continue
       }
@@ -79,9 +97,9 @@ function record(name, ok, detail = '') {
   console.log(line)
 }
 
-async function expect200(path, name = path) {
+async function expect200(path, name = path, opts = {}) {
   try {
-    const res = await fetchWithRetry(path)
+    const res = await fetchWithRetry(path, opts)
     record(name, res.status === 200, `HTTP ${res.status}`)
     return res
   } catch (err) {
@@ -196,13 +214,17 @@ async function smoke() {
       if (Array.isArray(manifest.icons)) {
         for (const icon of manifest.icons) {
           if (!icon?.src) continue
-          const iconUrl = icon.src.startsWith('http')
+          // Manifest icon `src` values are origin-absolute and already include
+          // any deploy base path (e.g. /FFC-EX-cactuswrenpreschool.com/icon.png
+          // on a subpath deploy). Resolve them against BASE with new URL() so
+          // the path *replaces* BASE's path instead of being appended to it —
+          // string concatenation would double the base path and 404 on every
+          // deploy (the root cause of the recurring prod-deploy incidents).
+          const iconUrl = /^https?:\/\//i.test(icon.src)
             ? icon.src
-            : icon.src.startsWith('/')
-              ? icon.src
-              : `/${icon.src}`
-          const iconPath = iconUrl.startsWith('http') ? iconUrl.replace(BASE, '') : iconUrl
-          const r = await fetchWithRetry(iconPath).catch(() => null)
+            : new URL(icon.src.startsWith('/') ? icon.src : `/${icon.src}`, BASE).href
+          // retryOn404 additionally absorbs genuine post-deploy CDN propagation lag.
+          const r = await fetchWithRetry(iconUrl, { retryOn404: true }).catch(() => null)
           const ok = r && r.status === 200
           record(`manifest icon ${icon.src} resolves`, ok, r ? `HTTP ${r.status}` : 'fetch failed')
         }
@@ -227,9 +249,10 @@ async function smoke() {
     )
   }
 
-  // 6. Favicon + icon are reachable.
-  await expect200('/favicon.ico')
-  await expect200('/icon.png')
+  // 6. Favicon + icon are reachable. Freshly deployed assets — tolerate
+  // CDN propagation lag (see #17).
+  await expect200('/favicon.ico', '/favicon.ico', { retryOn404: true })
+  await expect200('/icon.png', '/icon.png', { retryOn404: true })
 
   // 7. Summary.
   const failed = results.filter((r) => !r.ok)
