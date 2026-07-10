@@ -65,7 +65,7 @@ Re-run this verification any time with the shipped smoke check:
 npm run smoke -- https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
 ```
 
-> **Known non-issue:** GitHub Pages can serve a freshly deployed asset (manifest icons, favicons) as `404` for a few seconds on some edge nodes _immediately_ after `deploy-pages` returns, while the already-cached home page serves `200`. The post-deploy smoke check now retries `404` on those asset checks within its deadline so this CDN propagation lag no longer marks the deploy as failed. This was the root cause of the recurring "Production deployment failed" incidents.
+> **Recurring deploy failures (fixed):** On the subpath deploy, the post-deploy smoke check built each manifest-icon URL by concatenating the deploy base URL (which ends in `/FFC-EX-cactuswrenpreschool.com`) onto the icon's manifest `src` (which _already_ includes `/FFC-EX-cactuswrenpreschool.com/…`), producing a doubled path that `404`s **deterministically**. That failed the smoke-check step on every deploy and auto-filed the "Production deployment failed" incidents even though the site itself was healthy. The check now resolves icon `src` values against the origin with `new URL()` so the base path is not doubled, and additionally retries transient `404`s to absorb genuine post-deploy CDN propagation lag.
 
 ---
 

@@ -42,11 +42,16 @@ const deadline = Date.now() + TOTAL_DEADLINE_MS
 // static assets (manifest icons, favicons) can 404 on some GitHub Pages
 // edge nodes for a few seconds after `deploy-pages` returns, while the
 // already-cached home page serves 200. Retrying within the deadline
-// absorbs that propagation lag instead of failing the whole deploy — the
-// root cause of the recurring "Production deployment failed" incidents.
-// Route/page checks leave this false so a genuine missing page still fails.
-async function fetchWithRetry(path, { retryOn404 = false } = {}) {
-  const url = `${BASE}${path}`
+// absorbs that propagation lag instead of failing the deploy. (This is
+// complementary defense; the main cause of the recurring prod-deploy
+// incidents was a deterministic double-prefixed icon URL, fixed in the
+// manifest icon check below.) Route/page checks leave this false so a
+// genuine missing page still fails.
+async function fetchWithRetry(pathOrUrl, { retryOn404 = false } = {}) {
+  // Accept either a site-absolute path (prefixed with BASE) or an already
+  // absolute http(s) URL. Prefixing BASE onto a path that already contains
+  // the deploy base path would double it and 404 deterministically.
+  const url = /^https?:\/\//i.test(pathOrUrl) ? pathOrUrl : `${BASE}${pathOrUrl}`
   let lastErr = null
   for (let attempt = 1; Date.now() < deadline; attempt++) {
     const controller = new AbortController()
@@ -204,14 +209,17 @@ async function smoke() {
       if (Array.isArray(manifest.icons)) {
         for (const icon of manifest.icons) {
           if (!icon?.src) continue
-          const iconUrl = icon.src.startsWith('http')
+          // Manifest icon `src` values are origin-absolute and already include
+          // any deploy base path (e.g. /FFC-EX-cactuswrenpreschool.com/icon.png
+          // on a subpath deploy). Resolve them against BASE with new URL() so
+          // the path *replaces* BASE's path instead of being appended to it —
+          // string concatenation would double the base path and 404 on every
+          // deploy (the root cause of the recurring prod-deploy incidents).
+          const iconUrl = /^https?:\/\//i.test(icon.src)
             ? icon.src
-            : icon.src.startsWith('/')
-              ? icon.src
-              : `/${icon.src}`
-          const iconPath = iconUrl.startsWith('http') ? iconUrl.replace(BASE, '') : iconUrl
-          // Freshly deployed asset — tolerate CDN propagation lag (see #17).
-          const r = await fetchWithRetry(iconPath, { retryOn404: true }).catch(() => null)
+            : new URL(icon.src.startsWith('/') ? icon.src : `/${icon.src}`, BASE).href
+          // retryOn404 additionally absorbs genuine post-deploy CDN propagation lag.
+          const r = await fetchWithRetry(iconUrl, { retryOn404: true }).catch(() => null)
           const ok = r && r.status === 200
           record(`manifest icon ${icon.src} resolves`, ok, r ? `HTTP ${r.status}` : 'fetch failed')
         }
