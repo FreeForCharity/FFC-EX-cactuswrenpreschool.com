@@ -157,14 +157,14 @@ export const staff: Person[] = [
   {
     name: 'Patsy Romero',
     role: 'Pre-School Teacher',
-    photo: `${IMG}/457f82_0f33b821fdfe4591936e33e5479d39e9.jpg`,
+    photo: `${IMG}/patsy-romero-headshot.jpg`,
     email: 'misspatsycw@gmail.com',
     bio: 'Patsy is the lead teacher for the preschool class.',
   },
   {
     name: 'Elizabeth (Lizzy) Merkley',
     role: 'Pre-School Aide',
-    photo: `${IMG}/457f82_3b02992dcdec4cc488673777585836f2.jpg`,
+    photo: `${IMG}/elizabeth-merkley-headshot.jpg`,
     bio: 'Lizzy is the aide for the preschool class.',
   },
   {

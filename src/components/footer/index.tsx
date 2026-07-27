@@ -25,7 +25,7 @@ const Footer: React.FC = () => {
           </div>
           <p className="text-sm leading-relaxed text-white/80">
             A secular, play-based, non-profit cooperative preschool serving Sierra Vista, Arizona
-            since 1979. Affordable preschool and Pre-K for children ages 3 to 5.
+            since 1979. Affordable preschool and Pre-K for ages 3 to 5.
           </p>
           <a
             href={contact.facebook}
