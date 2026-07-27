@@ -177,7 +177,7 @@ export const staff: Person[] = [
   {
     name: 'Liz Davis',
     role: 'Pre-K Aide',
-    photo: `${IMG}/457f82_06a26223343c4ce6ac839a47ba5f3112.jpg`,
+    photo: `${IMG}/liz-davis-headshot.jpg`,
     bio: 'Liz is the aide for the Pre-K class.',
   },
 ]
