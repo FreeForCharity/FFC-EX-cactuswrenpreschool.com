@@ -124,7 +124,7 @@ export const board: Person[] = [
     name: 'Taylor Brennan',
     role: 'Director',
     photo: `${IMG}/457f82_c3894fac51384a90a7c86e275eaa45b9.jpg`,
-    bio: 'Taylor is very excited for her first year as director of Cactus Wren Preschool. After her daughter attended last year, Taylor fell in love with the school. Her background in early childhood education and office management will enable her to keep the legacy of Cactus Wren alive for years to come.',
+    bio: 'Taylor is very excited for her second year as Director of Cactus Wren. After her daughter attended last year, Taylor fell in love with the school. Her background in early childhood education and office management will enable her to keep the legacy of Cactus Wren alive for years to come.',
   },
   {
     name: 'Shannon Lenzmeier',
