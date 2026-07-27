@@ -78,9 +78,6 @@ export default function AboutUsPage() {
           <Button href={`mailto:${contact.email}`} variant="accent">
             Email Us
           </Button>
-          <Button href="/enrollment" variant="outline">
-            Apply Today
-          </Button>
         </div>
       </Section>
     </>
