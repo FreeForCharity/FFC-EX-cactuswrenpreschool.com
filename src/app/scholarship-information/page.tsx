@@ -56,8 +56,7 @@ export default function ScholarshipPage() {
           <p>
             Financial assistance is based on availability of funds. Scholarships are available on a
             first-come, first-served basis and fill up quickly. If you are interested in the
-            availability of financial assistance, please contact our Financial Director, Brian
-            Lenzmeier. Applications and all supporting paperwork are accepted electronically via{' '}
+            availability of financial assistance, please contact our director, Taylor Brennan. Applications and all supporting paperwork are accepted electronically via{' '}
             <a href={`mailto:${contact.email}`}>email</a>, or you can mail a hard copy to:
           </p>
           <p className="font-semibold text-ink not-prose">
