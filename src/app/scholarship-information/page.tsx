@@ -63,9 +63,9 @@ export default function ScholarshipPage() {
           <p className="font-semibold text-ink not-prose">
             Cactus Wren Preschool — Attn: Scholarships
             <br />
-            {contact.street}
+            PO Box 1112
             <br />
-            {contact.city}, {contact.state} {contact.zip}
+            Sierra Vista, AZ 85636
           </p>
         </div>
         <div className="mt-6">
