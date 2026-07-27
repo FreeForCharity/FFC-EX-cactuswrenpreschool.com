@@ -69,7 +69,7 @@ const Home = () => {
         <div className="ffc-container grid items-center gap-10 py-14 md:py-20 lg:grid-cols-2">
           <div>
             <p className="text-accent font-semibold uppercase tracking-wider text-sm">
-              Established 1979 · Sierra Vista, Arizona
+              Established 1978 · Sierra Vista, Arizona
             </p>
             <h1 className="cw-display mt-3 text-4xl md:text-5xl lg:text-6xl text-primary-dark leading-tight">
               A Play-Based Preschool
