@@ -11,6 +11,8 @@ import { contact, img } from '@/lib/cw'
 
 const values = ['Quality', 'Positivity', 'Integrity', 'Teamwork', 'Stewardship', 'Professionalism']
 
+const bestOfCochiseInstagramUrl = 'https://www.instagram.com/p/Dal62sMGSMl/?img_index=5'
+
 const heroSlides = [
   {
     src: img.heroScience,
@@ -84,6 +86,48 @@ const Home = () => {
           </div>
           <div className="relative">
             <HeroCarousel slides={heroSlides} />
+          </div>
+        </div>
+      </section>
+
+      {/* Best of Cochise County recognition */}
+      <section className="bg-paper" aria-labelledby="best-of-cochise-heading">
+        <div className="ffc-container py-10 md:py-12">
+          <div className="mx-auto flex max-w-5xl flex-col items-center gap-7 rounded-3xl bg-cream px-6 py-8 text-center shadow-sm ring-1 ring-black/5 md:flex-row md:px-10 md:text-left">
+            <a
+              href={bestOfCochiseInstagramUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 rounded-2xl transition-transform hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary"
+              aria-label="View the Best of Cochise County announcement on Instagram"
+            >
+              <Image
+                src={assetPath('/images/cw/best-of-cochise-county.jpg')}
+                alt="Best of Cochise County award"
+                width={237}
+                height={283}
+                className="h-auto w-32 md:w-40"
+              />
+            </a>
+            <div className="flex-1">
+              <p className="text-accent font-semibold uppercase tracking-wider text-sm">
+                Community Recognition
+              </p>
+              <h2
+                id="best-of-cochise-heading"
+                className="cw-display mt-2 text-3xl text-primary-dark"
+              >
+                Proud to Be Voted Best of Cochise County
+              </h2>
+              <p className="mt-3 text-lg leading-relaxed text-ink/75">
+                Thank you to our families and community for recognizing Cactus Wren Preschool!
+              </p>
+              <div className="mt-5">
+                <Button href={bestOfCochiseInstagramUrl} variant="primary" external>
+                  See the Announcement on Instagram
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
