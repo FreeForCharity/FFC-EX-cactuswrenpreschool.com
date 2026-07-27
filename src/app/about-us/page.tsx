@@ -23,11 +23,11 @@ export default function AboutUsPage() {
 
       {/* Director's welcome */}
       <Section className="max-w-3xl">
-        <h2 className="cw-display text-3xl text-primary">A Director&apos;s Welcome</h2>
+        <h2 className="cw-display text-3xl text-primary">Director&apos;s Welcome</h2>
         <div className="cw-prose mt-4 text-ink/75">
           <p>
             Welcome to Cactus Wren Preschool! I&apos;m Taylor, and I&apos;m honored to serve as the
-            new Director of this warm and vibrant community. My journey in early childhood education
+            Director of this warm and vibrant community. My journey in early childhood education
             began in my home state of Oregon, where I developed a deep love for nurturing young
             minds through hands-on work in daycares and preschools. After moving to Arizona in 2020,
             I expanded my experience by supporting children with special needs — an experience that
