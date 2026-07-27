@@ -7,7 +7,7 @@ import Button from '@/components/ui/Button'
 export const metadata: Metadata = {
   title: 'Class Schedules',
   description:
-    'Cactus Wren offers 3-Day Preschool and 3-Day Pre-K programs for children ages 3 to 5, plus optional aftercare. Small class sizes with a teacher and aide in every class.',
+    'Cactus Wren offers 3-Day Preschool and 3-Day Pre-K programs for children ages 3 to 5. Small class sizes with a teacher and aide in every class.',
 }
 
 const classes = [
@@ -22,12 +22,6 @@ const classes = [
     days: 'Tuesday, Wednesday & Thursday',
     time: '8:30 am – 12:30 pm',
     note: 'For 4 & 5-year-olds starting Kindergarten the following year',
-  },
-  {
-    title: 'Aftercare',
-    days: 'Tuesday, Wednesday & Thursday',
-    time: '12:30 pm – 3:00 pm',
-    note: 'Cost and availability TBD based on interest',
   },
 ]
 
@@ -68,7 +62,7 @@ export default function ClassSchedulesPage() {
       </Section>
 
       <Section muted>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
           {classes.map((c) => (
             <div key={c.title} className="rounded-2xl bg-paper p-6 shadow-sm ring-1 ring-black/5">
               <h3 className="cw-heading text-xl text-primary">{c.title}</h3>
