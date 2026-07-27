@@ -4,12 +4,6 @@
  * This site was migrated off Wix into the Free For Charity Next.js template.
  * All content, media, and documents are served locally so the site is fully
  * decoupled from Wix.
- *
- * NOTE ON URL: While DNS still points the custom domain (cactuswrenpreschool.com)
- * at Wix, this build is deployed to the default GitHub Pages project URL:
- *   https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com
- * Once DNS is transferred, add a public/CNAME file with the custom domain and
- * update `url` below to https://www.cactuswrenpreschool.com.
  */
 
 export type SiteSocialLink = {
@@ -57,12 +51,7 @@ export const siteConfig: SiteConfig = {
     'Cactus Wren Cooperative Preschool is a secular, play-based, non-profit preschool established in 1980 in Sierra Vista, Arizona, offering affordable preschool and Pre-K programs for children ages 3 to 5.',
   shortDescription:
     'A secular, play-based, non-profit cooperative preschool in Sierra Vista, AZ, serving children ages 3 to 5 since 1980.',
-  // Bare origin only (the drift check enforces no path component). On this
-  // GitHub Pages project deploy the `/FFC-EX-cactuswrenpreschool.com` subpath
-  // is supplied at build time via NEXT_PUBLIC_BASE_PATH / assetPath(), so
-  // asset URLs still resolve correctly. When DNS is transferred, add a
-  // public/CNAME and change this to https://www.cactuswrenpreschool.com.
-  url: 'https://freeforcharity.github.io',
+  url: 'https://www.cactuswrenpreschool.com',
   twitterHandle: '',
   contactEmail: 'cactuswrenpreschool@gmail.com',
   keywords: [
