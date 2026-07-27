@@ -133,18 +133,6 @@ export const board: Person[] = [
     bio: "Shannon is thrilled to serve as Cactus Wren's Board President! Her family has loved being part of the school - both of her children attended Cactus Wren from 2021-2025. As a home health physical therapist, she enjoys the flexibility to stay involved in classroom activities and school events. She is excited to help support a welcoming, engaging environment for all Cactus Wren families.",
   },
   {
-    name: 'Emilie Carlotto',
-    role: 'Vice President',
-    photo: `${IMG}/457f82_493981616705483989062ef09c2de3d4.jpg`,
-    bio: "Emilie's family has resided in Sierra Vista for over eight years. Her son is currently in his second year at Cactus Wren. After several years in education, Emilie became a stay at home mom. She is looking forward to organizing fun and engaging events for our little ones and their families!",
-  },
-  {
-    name: 'Erika Mark',
-    role: 'Secretary',
-    photo: `${IMG}/457f82_e8bb5f2f60164118977b9118aa57cd16.jpg`,
-    bio: "Erika looks forward to being part of Cactus Wren Preschool for her daughter's second year at the school. She is the owner and artist behind Lumenrose Jewelry. She and her family have truly appreciated the play-based nature of the school and as Board Secretary Erika is happy to support the school's mission.",
-  },
-  {
     name: 'Stephanie Cespedes',
     role: 'Social Media Manager',
     photo: `${IMG}/457f82_2adefcf8ba164f5394c9125b87a3aad8.jpg`,
