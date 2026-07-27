@@ -30,12 +30,6 @@ const plans = [
       '10-month installment: $3,325.00 (5% discount)',
     ],
   },
-  {
-    title: 'Aftercare',
-    when: 'Tuesday, Wednesday & Thursday · 12:30 pm – 3:00 pm',
-    monthly: 'Cost & availability TBD',
-    installments: ['Based on interest'],
-  },
 ]
 
 export default function TuitionPage() {
@@ -55,7 +49,7 @@ export default function TuitionPage() {
           <p className="text-sm text-ink/60 mt-1">(Registration fee is non-refundable.)</p>
         </div>
 
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
+        <div className="mx-auto mt-8 grid max-w-4xl gap-6 md:grid-cols-2">
           {plans.map((p) => (
             <div key={p.title} className="rounded-2xl bg-paper p-6 shadow-sm ring-1 ring-black/5">
               <h3 className="cw-heading text-xl text-primary">{p.title}</h3>
