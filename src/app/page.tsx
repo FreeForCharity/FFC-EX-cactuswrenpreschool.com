@@ -38,12 +38,6 @@ const programs = [
     when: 'Tue, Wed & Thu · 8:30 am – 12:30 pm',
     image: img.classroom3,
   },
-  {
-    title: 'Aftercare',
-    age: 'Enrolled students',
-    when: 'Tue, Wed & Thu · 12:30 – 3:00 pm',
-    image: img.classroom2,
-  },
 ]
 
 const Home = () => {
@@ -114,7 +108,7 @@ const Home = () => {
             Small class sizes (max 15 students) with one professional teacher and a qualified aide.
           </p>
         </div>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
           {programs.map((p) => (
             <div
               key={p.title}
