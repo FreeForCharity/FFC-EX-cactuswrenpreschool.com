@@ -124,13 +124,13 @@ export const board: Person[] = [
     name: 'Taylor Brennan',
     role: 'Director',
     photo: `${IMG}/457f82_c3894fac51384a90a7c86e275eaa45b9.jpg`,
-    bio: 'Taylor is very excited for her first year as director of Cactus Wren Preschool. After her daughter attended last year, Taylor fell in love with the school. Her background in early childhood education and office management will enable her to keep the legacy of Cactus Wren alive for years to come.',
+    bio: 'Taylor is very excited for her second year as Director of Cactus Wren. After her daughter attended last year, Taylor fell in love with the school. Her background in early childhood education and office management will enable her to keep the legacy of Cactus Wren alive for years to come.',
   },
   {
     name: 'Shannon Lenzmeier',
     role: 'President',
     photo: `${IMG}/457f82_74863b5c0dc14e1698d1f0a8af4ab4c2.jpg`,
-    bio: "Shannon is thrilled to serve as Cactus Wren's Board President! Her family has loved being part of the school - her oldest attended for two years, and her youngest is now in her second year. As a home health physical therapist, she enjoys the flexibility to stay involved in classroom activities and school events. She is excited to help support a welcoming, engaging environment for all Cactus Wren families.",
+    bio: "Shannon is thrilled to serve as Cactus Wren's Board President! Her family has loved being part of the school - both of her children attended Cactus Wren from 2021-2025. As a home health physical therapist, she enjoys the flexibility to stay involved in classroom activities and school events. She is excited to help support a welcoming, engaging environment for all Cactus Wren families.",
   },
   {
     name: 'Emilie Carlotto',
