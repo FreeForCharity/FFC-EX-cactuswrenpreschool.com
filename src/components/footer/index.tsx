@@ -2,7 +2,7 @@ import React from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { FaFacebook } from 'react-icons/fa'
-import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi'
+import { FiAtSign, FiMail, FiMapPin, FiPhone } from 'react-icons/fi'
 import { assetPath } from '@/lib/assetPath'
 import { contact, img, nav } from '@/lib/cw'
 
@@ -60,11 +60,25 @@ const Footer: React.FC = () => {
             <p className="flex items-start gap-2">
               <FiMapPin aria-hidden="true" className="mt-0.5 shrink-0" />
               <span>
+                <span className="font-semibold text-white">Physical school location</span>
+                <br />
                 {contact.venue}
                 <br />
                 {contact.street}
                 <br />
                 {contact.city}, {contact.state} {contact.zip}
+              </span>
+            </p>
+            <p className="flex items-start gap-2">
+              <FiMail aria-hidden="true" className="mt-0.5 shrink-0" />
+              <span>
+                <span className="font-semibold text-white">Mailing address</span>
+                <br />
+                Cactus Wren Preschool
+                <br />
+                PO Box 1112
+                <br />
+                Sierra Vista, AZ 85636
               </span>
             </p>
             <p className="flex items-center gap-2">
@@ -74,7 +88,7 @@ const Footer: React.FC = () => {
               </a>
             </p>
             <p className="flex items-center gap-2">
-              <FiMail aria-hidden="true" />
+              <FiAtSign aria-hidden="true" />
               <a href={`mailto:${contact.email}`} className="hover:text-yellow break-all">
                 {contact.email}
               </a>
