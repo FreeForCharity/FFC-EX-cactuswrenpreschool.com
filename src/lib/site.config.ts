@@ -54,9 +54,9 @@ export const siteConfig: SiteConfig = {
   name: 'Cactus Wren Cooperative Preschool',
   tagline: 'A Play-Based Preschool in Sierra Vista, Arizona',
   description:
-    'Cactus Wren Cooperative Preschool is a secular, play-based, non-profit preschool established in 1980 in Sierra Vista, Arizona, offering affordable preschool and Pre-K programs for children ages 3 to 5.',
+    'Cactus Wren Cooperative Preschool is a secular, play-based, non-profit preschool established in 1979 in Sierra Vista, Arizona, offering affordable preschool and Pre-K programs for children ages 3 to 5.',
   shortDescription:
-    'A secular, play-based, non-profit cooperative preschool in Sierra Vista, AZ, serving children ages 3 to 5 since 1980.',
+    'A secular, play-based, non-profit cooperative preschool in Sierra Vista, AZ, serving children ages 3 to 5 since 1979.',
   // Bare origin only (the drift check enforces no path component). On this
   // GitHub Pages project deploy the `/FFC-EX-cactuswrenpreschool.com` subpath
   // is supplied at build time via NEXT_PUBLIC_BASE_PATH / assetPath(), so

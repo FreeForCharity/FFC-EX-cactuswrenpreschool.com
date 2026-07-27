@@ -20,7 +20,7 @@ export function buildOrganizationSchema(): Record<string, unknown> {
     logo: siteUrl(assetPath(img.logo)),
     telephone: contact.phone,
     email: siteConfig.contactEmail,
-    foundingDate: '1980',
+    foundingDate: '1979',
     address: {
       '@type': 'PostalAddress',
       streetAddress: contact.street,
