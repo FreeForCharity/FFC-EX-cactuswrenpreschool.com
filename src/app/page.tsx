@@ -242,7 +242,7 @@ const Home = () => {
               </li>
               <li className="flex gap-2">
                 <FiArrowRight className="text-accent mt-1 shrink-0" aria-hidden="true" /> We are
-                faithful in our mission to serve the public interest.
+                committed to our mission of serving the public interest.
               </li>
             </ul>
           </div>
