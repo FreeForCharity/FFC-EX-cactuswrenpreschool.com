@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 const hours = [
   ['Sunday', 'Closed'],
-  ['Monday', '8:00 am – 1:00 pm'],
+  ['Monday', 'Closed'],
   ['Tuesday', '8:00 am – 1:00 pm'],
   ['Wednesday', '8:00 am – 1:00 pm'],
   ['Thursday', '8:00 am – 1:00 pm'],
