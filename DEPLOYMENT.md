@@ -254,7 +254,7 @@ There is no `gh-pages` branch; the built `./out` directory is uploaded as a Page
 
 ### Custom Domain Setup
 
-The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS still points at Wix. When you are ready to connect it, follow the [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages) runbook below, which covers the `public/CNAME` file, the DNS records, and the basePath flip in one ordered checklist.
+The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS still points at Wix, and the domain is _registered_ at Wix, which blocks the move to Cloudflare until the registration transfers. The cutover is intentionally waiting on that transfer; see [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages) below for the constraint and the ordered runbook covering the `public/CNAME` file, the DNS records, and the basePath flip.
 
 Quick reference for the CNAME file (added during cutover):
 
@@ -270,13 +270,42 @@ Once `public/CNAME` exists, the **Determine base path** step builds with an empt
 
 The site is fully built and verified on GitHub Pages, but the domain `cactuswrenpreschool.com` still resolves to **Wix** (apex `A` records in the `185.230.63.x` range, `www` served by Wix). This section is the ordered runbook for moving the domain to the GitHub Pages deployment.
 
+### Blocker: the domain is registered at Wix, and the cutover is deliberately deferred
+
+The domain is not merely _hosted_ at Wix — it is **registered** there, with Wix's own nameservers authoritative:
+
+```
+NS     ns14.wixdns.net / ns15.wixdns.net
+A   @  185.230.63.186 / .171 / .107        (Wix)
+CNAME  www → cdn1.wixdns.net               (Wix)
+MX     smtp.google.com                     (Google Workspace — must survive any change)
+TXT    v=spf1 include:_spf.google.com ~all
+```
+
+There is no DNSSEC, no `DS`, and no `CAA` record, so nothing blocks a future migration. There is also **no DMARC record**, which is worth adding whenever DNS moves.
+
+Two paths exist, and FFC has chosen the second:
+
+1. **Point DNS from inside Wix.** Wix does allow editing `A`/`CNAME` records for a domain it registers, so the GitHub Pages cutover below could be executed today without any transfer. Fastest, but leaves the domain at Wix.
+2. **Wait for the registrar transfer** (the chosen path). The domain moves Wix → eNom → Cloudflare first, and the cutover happens once, on Cloudflare DNS.
+
+Path 2 was chosen so the site lands on its final DNS provider rather than being cut over twice. The consequence is that this runbook stays parked until the transfer completes — the site remains served from the GitHub Pages project URL in the meantime, with no loss of function.
+
+> **Why a transfer is needed at all:** Wix does not permit changing nameservers on a Wix-registered domain ([Wix help center](https://support.wix.com/en/article/request-changing-name-server-ns-records-for-a-wix-domain)), and Cloudflare's free plan requires full nameserver delegation. So Cloudflare is unreachable until the registration itself moves. Cloudflare Registrar cannot be the direct destination either — it only accepts domains already on Cloudflare nameservers — which is why the route runs through eNom, FFC's registrar via WHMCS.
+
+The transfer itself is tracked in the automation repo, not here: see `docs/wix-domain-migration.md` and workflow `123. Domain - Inbound Transfer Preflight` in [FFC-Cloudflare-Automation](https://github.com/FreeForCharity/FFC-Cloudflare-Automation). Expect roughly: transfer to eNom (days to weeks), then nameservers to Cloudflare (same day), then this cutover.
+
+When DNS reaches Cloudflare, the records below are set there instead of at the registrar, and PR #21 (`feat: prepare custom-domain cutover`) supplies the matching code change.
+
 ### Pre-cutover checklist (do these first)
 
 - [x] Site content migrated off Wix and served locally (no Wix dependencies).
 - [x] All routes verified live on Pages — see [Current Deployment Status](#current-deployment-status).
 - [x] PWA manifest, `security.txt`, `robots.txt`, `sitemap.xml`, favicons, and security headers verified.
 - [x] Post-deploy smoke check tolerant of CDN propagation lag (deploys go green).
+- [ ] **Registrar transfer complete** — the domain is at eNom and its nameservers point at Cloudflare. Everything below is blocked on this.
 - [ ] Confirm you have access to the DNS zone for `cactuswrenpreschool.com` (registrar or Cloudflare).
+- [ ] Confirm the Google Workspace `MX` (`smtp.google.com`) and SPF `TXT` records were carried into the Cloudflare zone **before** the nameserver switch — dropping them breaks the school's email.
 - [ ] Decide the canonical host — this template targets **`www.cactuswrenpreschool.com`** with an apex redirect.
 
 ### Cutover steps
