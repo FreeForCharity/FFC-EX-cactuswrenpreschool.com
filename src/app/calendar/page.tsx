@@ -2,7 +2,6 @@ import React from 'react'
 import type { Metadata } from 'next'
 import PageHero from '@/components/ui/PageHero'
 import Section from '@/components/ui/Section'
-import Button from '@/components/ui/Button'
 import DocLink from '@/components/ui/DocLink'
 import { docs } from '@/lib/cw'
 
@@ -20,11 +19,6 @@ export default function CalendarPage() {
         <p className="text-lg text-ink/75">
           Download our school year calendar to keep track of important dates, holidays, and events.
         </p>
-        <div className="mt-8">
-          <Button href={docs.calendarDownload} variant="accent" external>
-            Download Calendar
-          </Button>
-        </div>
         <div className="mt-8 grid gap-3 text-left">
           <DocLink label="2026-2027 School Calendar (PDF)" href={docs.schoolCalendar} />
         </div>
