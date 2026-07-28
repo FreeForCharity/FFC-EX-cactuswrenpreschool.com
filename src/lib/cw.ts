@@ -156,27 +156,20 @@ export const board: Person[] = [
 export const staff: Person[] = [
   {
     name: 'Patsy Romero',
-    role: 'Pre-School Teacher',
+    role: 'Pre-K Teacher',
     photo: `${IMG}/patsy-romero-headshot.jpg`,
     email: 'misspatsycw@gmail.com',
     bio: 'Patsy is the lead teacher for the preschool class.',
   },
   {
     name: 'Elizabeth (Lizzy) Merkley',
-    role: 'Pre-School Aide',
+    role: 'Pre-K Aide (1st semester)',
     photo: `${IMG}/elizabeth-merkley-headshot.jpg`,
     bio: 'Lizzy is the aide for the preschool class.',
   },
   {
-    name: 'Rosa Ramsey',
-    role: 'Pre-K Teacher',
-    photo: `${IMG}/457f82_9f39ddb9b511452db720f3191aafb841.jpg`,
-    email: 'missrosacw@gmail.com',
-    bio: 'Rosa is the lead teacher for the Pre-K class.',
-  },
-  {
     name: 'Liz Davis',
-    role: 'Pre-K Aide',
+    role: 'Pre-K Aide (2nd semester)',
     photo: `${IMG}/liz-davis-headshot.jpg`,
     bio: 'Liz is the aide for the Pre-K class.',
   },
