@@ -31,7 +31,7 @@ export default function ClassSchedulesPage() {
       <PageHero
         eyebrow="Class Schedules"
         title="Class Schedules & Enrollment Policies"
-        subtitle="Small class sizes (max 15 students) to maximize learning potential."
+        subtitle="Small class sizes (max 16 students) to maximize learning potential."
       />
 
       <Section className="max-w-3xl">
