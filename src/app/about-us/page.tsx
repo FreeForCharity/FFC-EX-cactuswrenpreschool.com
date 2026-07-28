@@ -50,7 +50,7 @@ export default function AboutUsPage() {
       {/* Board of Directors */}
       <Section muted>
         <h2 className="cw-display text-3xl text-primary text-center mb-10">Board of Directors</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {board.map((p) => (
             <PersonCard key={p.name} person={p} />
           ))}
