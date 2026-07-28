@@ -194,6 +194,7 @@ export const docs = {
   emergencyInfo: `${DOC}/emergency-information-form.pdf`,
   byLaws: `${DOC}/by-laws-2025-2026.pdf`,
   schoolCalendar: `${DOC}/school-calendar-2026-2027.pdf`,
+  parentHandbook: `${DOC}/parent-handbook-2026-2027.pdf`,
   tuitionSchedule: `${DOC}/tuition-schedule-2025-2026.pdf`,
   dhsLicense: `${DOC}/dhs-license.pdf`,
   adultParticipation: `${DOC}/adult-participation-contract-photo-consent.pdf`,
