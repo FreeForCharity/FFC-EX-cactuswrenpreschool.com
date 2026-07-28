@@ -159,13 +159,13 @@ export const staff: Person[] = [
     role: 'Pre-K Teacher',
     photo: `${IMG}/patsy-romero-headshot.jpg`,
     email: 'misspatsycw@gmail.com',
-    bio: 'Patsy first joined Cactus Wren as a parent when her sons attended from 2004 to 2008. She returned as a teacher’s aide in 2022 and soon became a lead teacher. Patsy holds an associate’s degree in early childhood development and homeschooled her sons for 13 years. She is excited to support Cactus Wren’s youngest learners with a teaching approach centered on curiosity, individualized learning, care, and respect.',
+    bio: 'Patsy first joined Cactus Wren as a parent when her sons attended from 2004 to 2008. She returned as a teacher’s aide in 2022 and soon became a lead teacher. Patsy holds an associate’s degree in early childhood development and homeschooled her sons for 13 years. She is excited to support Cactus Wren’s Pre-K learners with a teaching approach centered on curiosity, individualized learning, care, and respect.',
   },
   {
     name: 'Elizabeth (Lizzy) Merkley',
     role: 'Pre-K Aide (1st semester)',
     photo: `${IMG}/elizabeth-merkley-headshot.jpg`,
-    bio: 'Lizzy is the aide for the preschool class.',
+    bio: 'Elizabeth (“Ms. Lizzy”) Merkley is thrilled to join the Cactus Wren staff. She holds a bachelor’s degree in social work and has experience in Applied Behavior Analysis, supporting children with autism at home and school. She is passionate about play-based learning and helping children grow socially. Outside the classroom, she enjoys hiking, traveling, and spending time with family. Her eight-year-old son previously attended Cactus Wren, and her daughter, Catherine, is currently in the Pre-K class.',
   },
   {
     name: 'Liz Davis',
