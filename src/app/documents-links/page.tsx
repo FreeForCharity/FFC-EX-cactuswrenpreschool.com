@@ -16,7 +16,6 @@ type Item = { label: string; href: string; external?: boolean; note?: string }
 const studentDocs: Item[] = [
   { label: 'Application Form', href: docs.applicationForm },
   { label: 'Enrollment Packet', href: docs.enrollmentPacket },
-  { label: '2025-2026 Orientation Manual', href: docs.orientationManual },
   { label: 'Emergency Information Form', href: docs.emergencyInfo },
   { label: 'Hand Sanitizer Permission', href: docs.handSanitizer },
   { label: 'Adult Participation Contract & Photo Consent', href: docs.adultParticipation },
