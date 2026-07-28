@@ -10,18 +10,8 @@ import { contact } from '@/lib/cw'
 export const metadata: Metadata = {
   title: 'Contact Us',
   description:
-    'Contact Cactus Wren Cooperative Preschool in Sierra Vista, Arizona. Find our address, phone number, email, hours of operation, and board members.',
+    'Contact Cactus Wren Cooperative Preschool in Sierra Vista, Arizona. Find our address, phone number, email, and hours of operation.',
 }
-
-const board = [
-  ['Director', 'Taylor Brennan'],
-  ['Financial Director', 'Brian Lenzmeier'],
-  ['President', 'Shannon Lenzmeier'],
-  ['Vice-President', 'Emilie Carlotto'],
-  ['Secretary', 'Erika Mark'],
-  ['Social Media Manager', 'Stephanie Cespedes'],
-  ['Fundraising Coordinator', 'Emily Marinaro'],
-]
 
 const hours = [
   ['Sunday', 'Closed'],
@@ -102,30 +92,16 @@ export default function ContactPage() {
           </div>
         </div>
 
-        <div className="space-y-8">
-          <div>
-            <h2 className="cw-display text-2xl text-primary">Hours of Operation</h2>
-            <dl className="mt-4 divide-y divide-black/5 rounded-2xl bg-paper ring-1 ring-black/5">
-              {hours.map(([day, time]) => (
-                <div key={day} className="flex justify-between px-5 py-2.5 text-sm">
-                  <dt className="font-semibold text-ink">{day}</dt>
-                  <dd className="text-ink/70">{time}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
-
-          <div>
-            <h2 className="cw-display text-2xl text-primary">Board Members</h2>
-            <dl className="mt-4 divide-y divide-black/5 rounded-2xl bg-paper ring-1 ring-black/5">
-              {board.map(([role, name]) => (
-                <div key={role} className="flex justify-between gap-4 px-5 py-2.5 text-sm">
-                  <dt className="font-semibold text-ink">{role}</dt>
-                  <dd className="text-ink/70 text-right">{name}</dd>
-                </div>
-              ))}
-            </dl>
-          </div>
+        <div>
+          <h2 className="cw-display text-2xl text-primary">Hours of Operation</h2>
+          <dl className="mt-4 divide-y divide-black/5 rounded-2xl bg-paper ring-1 ring-black/5">
+            {hours.map(([day, time]) => (
+              <div key={day} className="flex justify-between px-5 py-2.5 text-sm">
+                <dt className="font-semibold text-ink">{day}</dt>
+                <dd className="text-ink/70">{time}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </Section>
     </>
