@@ -26,7 +26,7 @@ export default function CalendarPage() {
           </Button>
         </div>
         <div className="mt-8 grid gap-3 text-left">
-          <DocLink label="2025-2026 School Calendar (PDF)" href={docs.schoolCalendar} />
+          <DocLink label="2026-2027 School Calendar (PDF)" href={docs.schoolCalendar} />
         </div>
       </Section>
     </>

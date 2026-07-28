@@ -28,11 +28,14 @@ const groups = [
     title: 'Support the Classroom',
     items: [
       'Bring in supplies as needed/requested by your student’s teacher',
-      'Become an official Parent Volunteer and serve as a substitute Teacher’s Aide',
       'Help teachers prepare activities and classwork',
       'Cutting out lamination',
       'Assembling craft packets',
     ],
+  },
+  {
+    title: "Become a Substitute Teacher's Aide",
+    items: ['TB form within the last year', 'Fingerprint card', 'DTaP vaccination'],
   },
   {
     title: 'Provide Services',
@@ -71,7 +74,7 @@ export default function VolunteeringPage() {
       </Section>
 
       <Section muted>
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {groups.map((g) => (
             <div key={g.title} className="rounded-2xl bg-paper p-6 shadow-sm ring-1 ring-black/5">
               <h3 className="cw-heading text-lg text-primary">{g.title}</h3>
