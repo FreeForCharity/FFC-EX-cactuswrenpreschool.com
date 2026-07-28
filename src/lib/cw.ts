@@ -159,7 +159,7 @@ export const staff: Person[] = [
     role: 'Pre-K Teacher',
     photo: `${IMG}/patsy-romero-headshot.jpg`,
     email: 'misspatsycw@gmail.com',
-    bio: 'Patsy is the lead teacher for the preschool class.',
+    bio: 'Patsy first joined Cactus Wren as a parent when her sons attended from 2004 to 2008. She returned as a teacher’s aide in 2022 and soon became a lead teacher. Patsy holds an associate’s degree in early childhood development and homeschooled her sons for 13 years. She is excited to support Cactus Wren’s youngest learners with a teaching approach centered on curiosity, individualized learning, care, and respect.',
   },
   {
     name: 'Elizabeth (Lizzy) Merkley',
