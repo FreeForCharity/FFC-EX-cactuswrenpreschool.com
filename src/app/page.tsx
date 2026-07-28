@@ -117,7 +117,7 @@ const Home = () => {
                 id="best-of-cochise-heading"
                 className="cw-display mt-2 text-3xl text-primary-dark"
               >
-                Proud to Be Voted Best of Cochise County
+                Voted a Top 3 Preschool in Cochise County
               </h2>
               <p className="mt-3 text-lg leading-relaxed text-ink/75">
                 Thank you to our families and community for recognizing Cactus Wren Preschool!
