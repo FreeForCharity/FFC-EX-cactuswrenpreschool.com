@@ -47,21 +47,21 @@ export default function AboutUsPage() {
         </div>
       </Section>
 
-      {/* Board of Directors */}
-      <Section muted>
-        <h2 className="cw-display text-3xl text-primary text-center mb-10">Board of Directors</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {board.map((p) => (
-            <PersonCard key={p.name} person={p} />
-          ))}
-        </div>
-      </Section>
-
       {/* Teaching staff */}
       <Section>
         <h2 className="cw-display text-3xl text-primary text-center mb-10">Teaching Staff</h2>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {staff.map((p) => (
+            <PersonCard key={p.name} person={p} />
+          ))}
+        </div>
+      </Section>
+
+      {/* Board of Directors */}
+      <Section muted>
+        <h2 className="cw-display text-3xl text-primary text-center mb-10">Board of Directors</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {board.map((p) => (
             <PersonCard key={p.name} person={p} />
           ))}
         </div>

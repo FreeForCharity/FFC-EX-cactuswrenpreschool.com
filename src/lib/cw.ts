@@ -121,12 +121,6 @@ export type Person = {
 /** Board of Directors, in the order shown on the live About Us page. */
 export const board: Person[] = [
   {
-    name: 'Taylor Brennan',
-    role: 'Director',
-    photo: `${IMG}/457f82_c3894fac51384a90a7c86e275eaa45b9.jpg`,
-    bio: 'Taylor is very excited for her second year as Director of Cactus Wren. After her daughter attended last year, Taylor fell in love with the school. Her background in early childhood education and office management will enable her to keep the legacy of Cactus Wren alive for years to come.',
-  },
-  {
     name: 'Shannon Lenzmeier',
     role: 'President',
     photo: `${IMG}/457f82_74863b5c0dc14e1698d1f0a8af4ab4c2.jpg`,
@@ -154,6 +148,12 @@ export const board: Person[] = [
 
 /** Teaching staff, in the order shown on the live About Us page. */
 export const staff: Person[] = [
+  {
+    name: 'Taylor Brennan',
+    role: 'Director',
+    photo: `${IMG}/457f82_c3894fac51384a90a7c86e275eaa45b9.jpg`,
+    bio: 'Taylor is very excited for her second year as Director of Cactus Wren. After her daughter attended last year, Taylor fell in love with the school. Her background in early childhood education and office management will enable her to keep the legacy of Cactus Wren alive for years to come.',
+  },
   {
     name: 'Patsy Romero',
     role: 'Pre-K Teacher',
