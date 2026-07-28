@@ -304,8 +304,8 @@ When DNS reaches Cloudflare, the records below are set there instead of at the r
 - [x] PWA manifest, `security.txt`, `robots.txt`, `sitemap.xml`, favicons, and security headers verified.
 - [x] Post-deploy smoke check tolerant of CDN propagation lag (deploys go green).
 - [ ] **Registrar transfer complete** — the domain is at eNom and its nameservers point at Cloudflare. Everything below is blocked on this.
-- [ ] Confirm you have access to the DNS zone for `cactuswrenpreschool.com` (registrar or Cloudflare).
-- [ ] Confirm the Google Workspace `MX` (`smtp.google.com`) and SPF `TXT` records were carried into the Cloudflare zone **before** the nameserver switch — dropping them breaks the school's email.
+- [ ] Confirm you have access to the **Cloudflare** zone for `cactuswrenpreschool.com`. Once nameservers are delegated, Cloudflare is authoritative and the registrar's DNS panel no longer serves this domain — edits made there have no effect.
+- [ ] Confirm the **existing** mail records — every `MX` plus the SPF/DKIM/DMARC `TXT` records — were reproduced in the Cloudflare zone exactly as captured before the transfer, **before** the nameserver switch. Dropping or mistyping them breaks the school's email. Do not treat the zone snapshot above as the target; it is a point-in-time observation, and the live pre-transfer capture is what counts.
 - [ ] Decide the canonical host — this template targets **`www.cactuswrenpreschool.com`** with an apex redirect.
 
 ### Cutover steps
