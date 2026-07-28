@@ -173,6 +173,14 @@ export const staff: Person[] = [
     photo: `${IMG}/liz-davis-headshot.jpg`,
     bio: 'Liz comes from a culinary background and worked in home health care for four years. She is a mother of two daughters. One recently graduated from Cactus Wren, and her youngest will attend this school year. She has been an active volunteer for the school for two years and is thrilled to continue working side by side with Patsy after returning from the birth of her son.',
   },
+  {
+    name: 'Linzy Collister',
+    role: 'Preschool Teacher',
+  },
+  {
+    name: 'Carly Vieira',
+    role: 'Preschool Aide',
+  },
 ]
 
 const DOC = '/documents'
