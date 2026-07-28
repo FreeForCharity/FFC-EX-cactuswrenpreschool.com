@@ -24,7 +24,7 @@ const studentDocs: Item[] = [
 ]
 
 const parentResources: Item[] = [
-  { label: '2025-2026 By-Laws', href: docs.byLaws },
+  { label: '2026-2027 By-Laws', href: docs.byLaws },
   { label: '2026-2027 School Calendar', href: docs.schoolCalendar },
   { label: 'Tuition Policy', href: docs.tuitionSchedule },
   { label: '2026-2027 Parent Handbook', href: docs.parentHandbook },
