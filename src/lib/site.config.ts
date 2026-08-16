@@ -5,11 +5,13 @@
  * All content, media, and documents are served locally so the site is fully
  * decoupled from Wix.
  *
- * NOTE ON URL: While DNS still points the custom domain (cactuswrenpreschool.com)
- * at Wix, this build is deployed to the default GitHub Pages project URL:
- *   https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com
- * Once DNS is transferred, add a public/CNAME file with the custom domain and
- * update `url` below to https://www.cactuswrenpreschool.com.
+ * NOTE ON URL: the canonical host is www.cactuswrenpreschool.com, claimed by
+ * public/CNAME. Because that file exists, the deploy workflow's "Determine base
+ * path" step builds with an empty NEXT_PUBLIC_BASE_PATH, so assets resolve from
+ * the origin root rather than the /FFC-EX-cactuswrenpreschool.com subpath.
+ *
+ * The apex (cactuswrenpreschool.com) redirects to www, which is the behavior
+ * Wix served before the cutover — so existing inbound links and SEO are kept.
  */
 
 export type SiteSocialLink = {
@@ -57,12 +59,11 @@ export const siteConfig: SiteConfig = {
     'Cactus Wren Cooperative Preschool is a secular, play-based, non-profit preschool established in 1979 in Sierra Vista, Arizona, offering affordable preschool and Pre-K programs for children ages 3 to 5.',
   shortDescription:
     'A secular, play-based, non-profit cooperative preschool in Sierra Vista, AZ, serving children ages 3 to 5 since 1979.',
-  // Bare origin only (the drift check enforces no path component). On this
-  // GitHub Pages project deploy the `/FFC-EX-cactuswrenpreschool.com` subpath
-  // is supplied at build time via NEXT_PUBLIC_BASE_PATH / assetPath(), so
-  // asset URLs still resolve correctly. When DNS is transferred, add a
-  // public/CNAME and change this to https://www.cactuswrenpreschool.com.
-  url: 'https://freeforcharity.github.io',
+  // Bare origin only (the drift check enforces no path component). With
+  // public/CNAME present the build uses an empty NEXT_PUBLIC_BASE_PATH, so
+  // canonical URLs, sitemap.xml, robots.txt and security.txt all emit the
+  // production domain from this value.
+  url: 'https://www.cactuswrenpreschool.com',
   twitterHandle: '',
   contactEmail: 'cactuswrenpreschool@gmail.com',
   keywords: [

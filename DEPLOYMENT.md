@@ -26,7 +26,12 @@ The site is currently live at:
 - **GitHub Pages URL (live now)**: https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
 - **Custom Domain (target — DNS not yet cut over)**: https://www.cactuswrenpreschool.com
 
-> **Note:** The custom domain `cactuswrenpreschool.com` still points at Wix. Until DNS is cut over (see [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages)), the production build serves from the GitHub Pages project URL above, under the `/FFC-EX-cactuswrenpreschool.com` subpath.
+> **Note:** The custom domain `cactuswrenpreschool.com` still resolves to Wix — the DNS change is the
+> only remaining step (see [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages)). The
+> repo is already built for the custom domain: `public/CNAME` is present, so the build uses root-relative
+> asset paths rather than the `/FFC-EX-cactuswrenpreschool.com` subpath. A consequence of that is that
+> the project URL above now **redirects to `www.cactuswrenpreschool.com`**, so it will show the Wix
+> site until DNS is flipped.
 
 ### Technology Stack
 
@@ -165,7 +170,9 @@ else
 fi
 ```
 
-Because there is **no `public/CNAME` yet**, the current build uses `NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com` so images and assets resolve correctly at the GitHub Pages subpath. Adding a `CNAME` during DNS cutover automatically flips the build to the empty root path — no workflow edit required.
+`public/CNAME` now exists (`www.cactuswrenpreschool.com`), so the build uses an **empty** `NEXT_PUBLIC_BASE_PATH` and every asset resolves from the origin root. Verified on the cutover branch: the built artifact went from 62 root-relative `/FFC-EX-cactuswrenpreschool.com/` references to **0**.
+
+The trade-off this creates is the reason the cutover is ordered the way it is: once GitHub Pages claims a custom domain, the project URL `freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` **301-redirects to that domain**. Merging the CNAME therefore sends the preview URL to whatever DNS currently answers for `www` — Wix, until the DNS flip lands.
 
 ### Viewing Deployment Status
 
@@ -254,7 +261,7 @@ There is no `gh-pages` branch; the built `./out` directory is uploaded as a Page
 
 ### Custom Domain Setup
 
-The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS still points at Wix. When you are ready to connect it, follow the [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages) runbook below, which covers the `public/CNAME` file, the DNS records, and the basePath flip in one ordered checklist.
+The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS still points at Wix. The repo-side preparation (CNAME file, `siteConfig.url`, `security.txt` canonicals) is done; what remains is the DNS change itself. Follow the [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages) runbook below.
 
 Quick reference for the CNAME file (added during cutover):
 
@@ -270,57 +277,122 @@ Once `public/CNAME` exists, the **Determine base path** step builds with an empt
 
 The site is fully built and verified on GitHub Pages, but the domain `cactuswrenpreschool.com` still resolves to **Wix** (apex `A` records in the `185.230.63.x` range, `www` served by Wix). This section is the ordered runbook for moving the domain to the GitHub Pages deployment.
 
-### Pre-cutover checklist (do these first)
+### Where the zone actually lives (read this first)
+
+The registrar transfer started in WHMCS is **not** what unblocks this cutover, and waiting for it is
+not required. Two separate facts:
+
+- `cactuswrenpreschool.com` is delegated to **`ns14.wixdns.net` / `ns15.wixdns.net`**. Wix is the
+  DNS host, and the records below are edited **in the Wix DNS panel**.
+- Wix [does not permit changing nameservers](https://support.wix.com/en/article/request-changing-name-server-ns-records-for-a-wix-domain)
+  on a Wix-registered domain. That is why Cloudflare cannot serve this zone yet — Cloudflare's free
+  plan requires full NS delegation. Cloudflare becomes available only after the registrar transfer
+  completes and NS can be repointed.
+
+So the cutover is done **from Wix**, by editing records in place. Moving to Cloudflare later is a
+follow-up that does not block going live on Pages.
+
+### Captured zone (rollback record, captured 2026-08-16)
+
+| Type    | Name  | Value                                                | Cutover action    |
+| ------- | ----- | ---------------------------------------------------- | ----------------- |
+| `NS`    | `@`   | `ns14.wixdns.net`, `ns15.wixdns.net`                 | leave alone       |
+| `A`     | `@`   | `185.230.63.107`, `185.230.63.171`, `185.230.63.186` | **replace** (Wix) |
+| `CNAME` | `www` | `cdn1.wixdns.net`                                    | **replace** (Wix) |
+| `MX`    | `@`   | `10 smtp.google.com`                                 | **DO NOT TOUCH**  |
+| `TXT`   | `@`   | `v=spf1 include:_spf.google.com ~all`                | **DO NOT TOUCH**  |
+| `CAA`   | `@`   | none set                                             | leave unset       |
+
+> ⚠️ **The charity's email runs on Google Workspace.** The `MX` and SPF `TXT` records above are the
+> only thing keeping mail flowing. Deleting them — or using a Wix "remove all records / disconnect"
+> action that clears the zone — takes the preschool's email down. Change **only** the apex `A` and
+> the `www` `CNAME`.
+>
+> No `CAA` record is set, so Let's Encrypt is free to issue GitHub's certificate. If a `CAA` record
+> is ever added, it must include `letsencrypt.org` or HTTPS provisioning will silently fail.
+
+### Pre-cutover checklist
 
 - [x] Site content migrated off Wix and served locally (no Wix dependencies).
 - [x] All routes verified live on Pages — see [Current Deployment Status](#current-deployment-status).
 - [x] PWA manifest, `security.txt`, `robots.txt`, `sitemap.xml`, favicons, and security headers verified.
 - [x] Post-deploy smoke check tolerant of CDN propagation lag (deploys go green).
-- [ ] Confirm you have access to the DNS zone for `cactuswrenpreschool.com` (registrar or Cloudflare).
-- [ ] Decide the canonical host — this template targets **`www.cactuswrenpreschool.com`** with an apex redirect.
+- [x] Canonical host decided — **`www.cactuswrenpreschool.com`**, with the apex redirecting to it.
+      This matches what Wix serves today (apex already `301`s to `www`), so inbound links and search
+      rankings carry over.
+- [x] `public/CNAME`, `siteConfig.url`, and both `security.txt` copies updated; build verified to
+      emit **0** subpath references.
+- [x] Existing zone captured above for rollback.
+- [ ] Confirm Wix DNS panel access for the account holding the domain.
+- [ ] Lower the TTL on the apex `A` and `www` `CNAME` from `3600` to `300`, **at least an hour
+      before** the cutover. This is what makes rollback fast — at a 3600s TTL a bad cutover is
+      pinned in resolver caches for an hour.
 
 ### Cutover steps
 
-1. **Add the `CNAME` file** to the repo so GitHub Pages claims the domain and the build switches to the root base path:
+Steps 1 and 2 are **already done on the cutover branch** — they land when its PR merges.
+
+1. **`public/CNAME`** contains `www.cactuswrenpreschool.com`, so Pages claims the domain and the
+   build switches to the root base path.
+2. **`src/lib/site.config.ts`** `url` is `https://www.cactuswrenpreschool.com`, so canonical URLs,
+   `sitemap.xml`, `robots.txt`, and `security.txt` emit the production domain.
+
+3. **Merge the cutover PR**, then let the deploy finish.
+
+   > Ordering note: merging makes Pages claim the domain, which causes
+   > `freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` to **301-redirect to
+   > `www.cactuswrenpreschool.com`** — still Wix at this moment. That is expected and harmless:
+   > visitors keep seeing the old site until DNS changes. It does mean the Pages preview URL stops
+   > being a way to view the new site, so **do the final visual review before merging.**
+
+4. **Change the two record sets in the Wix DNS panel** (Wix → Domains → `cactuswrenpreschool.com` →
+   Advanced → Edit DNS Records). Delete the three Wix apex `A` records and the `www` `CNAME`, then
+   add:
+
+   | Type    | Name  | Value                      | TTL   |
+   | ------- | ----- | -------------------------- | ----- |
+   | `CNAME` | `www` | `freeforcharity.github.io` | `300` |
+   | `A`     | `@`   | `185.199.108.153`          | `300` |
+   | `A`     | `@`   | `185.199.109.153`          | `300` |
+   | `A`     | `@`   | `185.199.110.153`          | `300` |
+   | `A`     | `@`   | `185.199.111.153`          | `300` |
+
+   Optionally also add the apex `AAAA` records `2606:50c0:8000::153`, `2606:50c0:8001::153`,
+   `2606:50c0:8002::153`, `2606:50c0:8003::153`. These are the canonical GitHub Pages targets held in
+   `scripts/cloudflare-api-common.ps1` in FFC-Cloudflare-Automation — take them from there rather
+   than copying them around, since GitHub does rotate them.
+
+   Wix may warn that editing these records **disconnects the site from Wix**. That is the intended
+   outcome. Do not accept any option that also clears `MX`/`TXT`.
+
+5. **Set the custom domain in GitHub** → Settings → Pages → Custom domain:
+   `www.cactuswrenpreschool.com`. Wait for the DNS check to pass, then **enable "Enforce HTTPS"**.
+
+   > "Enforce HTTPS" stays greyed out until GitHub has issued the Let's Encrypt certificate, which
+   > only starts once DNS resolves to Pages. Expect a window of minutes to about an hour where
+   > `https://www.cactuswrenpreschool.com` serves a certificate warning. This is normal and clears
+   > itself; do not roll back over it. Come back and tick the box once it is selectable.
+
+6. **Verify** after propagation:
 
    ```bash
-   echo "www.cactuswrenpreschool.com" > public/CNAME
-   git add public/CNAME
-   git commit -m "chore: add CNAME for cactuswrenpreschool.com cutover"
-   ```
-
-   Merging this to `main` triggers a deploy that builds with an empty `NEXT_PUBLIC_BASE_PATH` (root paths), and GitHub registers the custom domain.
-
-2. **Update `src/lib/site.config.ts`** `url` from `https://freeforcharity.github.io` to `https://www.cactuswrenpreschool.com` so canonical URLs, `sitemap.xml`, `robots.txt`, and `security.txt` emit the production domain. (The drift check requires the bare origin with no path component.)
-
-3. **Set DNS records** at the domain's DNS provider:
-
-   | Type    | Name  | Value                                                     |
-   | ------- | ----- | --------------------------------------------------------- |
-   | `CNAME` | `www` | `freeforcharity.github.io`                                |
-   | `A`     | `@`   | `185.199.108.153`                                         |
-   | `A`     | `@`   | `185.199.109.153`                                         |
-   | `A`     | `@`   | `185.199.110.153`                                         |
-   | `A`     | `@`   | `185.199.111.153`                                         |
-   | `AAAA`  | `@`   | `2606:50c0:8000::153` (+ `8001`, `8002`, `8003` variants) |
-
-   These are GitHub Pages' apex IPs. **Remove the existing Wix `A`/`ALIAS` records** (`185.230.63.x`) for the apex and `www` in the same change.
-
-4. **Set the custom domain in GitHub** → Settings → Pages → Custom domain: `www.cactuswrenpreschool.com`, then wait for the DNS check to pass and **enable "Enforce HTTPS"** (GitHub provisions the Let's Encrypt certificate automatically once DNS resolves).
-
-5. **Verify** after propagation (can take up to 24–48h, usually much less):
-
-   ```bash
-   dig +short www.cactuswrenpreschool.com   # → freeforcharity.github.io CNAME chain
-   dig +short cactuswrenpreschool.com        # → the four 185.199.x GitHub apex IPs
    npm run smoke -- https://www.cactuswrenpreschool.com/
+
+   # From the FFC-Cloudflare-Automation checkout — read-only go/no-go, no dig required:
+   node scripts/preflight-cutover.mjs --domains=cactuswrenpreschool.com --marker="Cactus Wren"
    ```
 
-   All smoke checks should pass, and asset/icon URLs should now be root-relative (no `/FFC-EX-cactuswrenpreschool.com` prefix).
+   Also confirm mail still flows — send a test message to the preschool's Google Workspace address.
 
 ### Rollback
 
-If anything is wrong after cutover, restore the previous Wix `A`/`ALIAS` records at the DNS provider (DNS change only — no code change needed). The GitHub Pages deployment stays live at `https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` regardless, so there is no downtime window on the Pages side.
+DNS-only; no code change is needed, and the Pages deployment is unaffected. In the Wix DNS panel,
+restore the apex `A` records to `185.230.63.107`, `185.230.63.171`, `185.230.63.186` and the `www`
+`CNAME` to `cdn1.wixdns.net`. With TTLs pre-lowered to `300` this takes effect in about five minutes.
+
+Note that the Pages project URL no longer serves as a fallback once the custom domain is claimed — it
+redirects to `www`. To fully revert, also remove the custom domain in Settings → Pages and revert the
+`public/CNAME` file.
 
 ---
 
