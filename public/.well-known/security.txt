@@ -15,6 +15,6 @@
 Contact: mailto:cactuswrenpreschool@gmail.com
 Expires: 2027-01-01T00:00:00.000Z
 Preferred-Languages: en
-Canonical: https://www.cactuswrenpreschool.com/.well-known/security.txt
-Canonical: https://www.cactuswrenpreschool.com/security.txt
-Policy: https://www.cactuswrenpreschool.com/privacy-policy
+Canonical: https://cactuswrenpreschool.com/.well-known/security.txt
+Canonical: https://cactuswrenpreschool.com/security.txt
+Policy: https://cactuswrenpreschool.com/privacy-policy

@@ -23,15 +23,21 @@ The Cactus Wren Cooperative Preschool website is a static Next.js application de
 
 The site is currently live at:
 
-- **GitHub Pages URL (live now)**: https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
-- **Custom Domain (target — DNS not yet cut over)**: https://www.cactuswrenpreschool.com
+- **Custom domain (canonical, live)**: https://cactuswrenpreschool.com
+- **`www` subdomain**: `301`-redirects to the apex
+- **GitHub Pages project URL**: `https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` — redirects to the apex now that Pages has claimed the custom domain
 
-> **Note:** The custom domain `cactuswrenpreschool.com` still resolves to Wix — the DNS change is the
-> only remaining step (see [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages)). The
-> repo is already built for the custom domain: `public/CNAME` is present, so the build uses root-relative
-> asset paths rather than the `/FFC-EX-cactuswrenpreschool.com` subpath. A consequence of that is that
-> the project URL above now **redirects to `www.cactuswrenpreschool.com`**, so it will show the Wix
-> site until DNS is flipped.
+> **DNS cutover completed 2026-08-16.** The apex `A` records point at the GitHub Pages IPs, `www` is
+> a `CNAME` to `freeforcharity.github.io`, and the Google Workspace `MX`/SPF records were preserved.
+>
+> **The canonical host is the APEX**, set both in Settings → Pages and in `public/CNAME`. Those two
+> must agree: the `CNAME` file in each deployed artifact overwrites the Pages UI setting, so a
+> mismatch silently reverses the canonical host on the next deploy.
+>
+> Until the first deploy that carries `public/CNAME`, the artifact served at the apex was still the
+> old **subpath** build, so every asset requested `/FFC-EX-cactuswrenpreschool.com/_next/…` and
+> returned `404` while the HTML itself returned `200`. That is the signature of this specific
+> mismatch: pages load, styling and fonts do not. It clears with the first custom-domain deploy.
 
 ### Technology Stack
 
@@ -170,7 +176,7 @@ else
 fi
 ```
 
-`public/CNAME` now exists (`www.cactuswrenpreschool.com`), so the build uses an **empty** `NEXT_PUBLIC_BASE_PATH` and every asset resolves from the origin root. Verified on the cutover branch: the built artifact went from 62 root-relative `/FFC-EX-cactuswrenpreschool.com/` references to **0**.
+`public/CNAME` now exists (`cactuswrenpreschool.com`), so the build uses an **empty** `NEXT_PUBLIC_BASE_PATH` and every asset resolves from the origin root. Verified on the cutover branch: the built artifact went from 62 root-relative `/FFC-EX-cactuswrenpreschool.com/` references to **0**.
 
 The trade-off this creates is the reason the cutover is ordered the way it is: once GitHub Pages claims a custom domain, the project URL `freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` **301-redirects to that domain**. Merging the CNAME therefore sends the preview URL to whatever DNS currently answers for `www` — Wix, until the DNS flip lands.
 
@@ -273,7 +279,7 @@ The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS s
 Quick reference — the contents of `public/CNAME`:
 
 ```
-www.cactuswrenpreschool.com
+cactuswrenpreschool.com
 ```
 
 Because that file exists, the **Determine base path** step builds with an empty `NEXT_PUBLIC_BASE_PATH` automatically — no other change needed.
@@ -324,7 +330,7 @@ follow-up that does not block going live on Pages.
 - [x] All routes verified live on Pages — see [Current Deployment Status](#current-deployment-status).
 - [x] PWA manifest, `security.txt`, `robots.txt`, `sitemap.xml`, favicons, and security headers verified.
 - [x] Post-deploy smoke check tolerant of CDN propagation lag (deploys go green).
-- [x] Canonical host decided — **`www.cactuswrenpreschool.com`**, with the apex redirecting to it.
+- [x] Canonical host decided — **`cactuswrenpreschool.com`**, with the apex redirecting to it.
       This matches what Wix serves today (apex already `301`s to `www`), so inbound links and search
       rankings carry over.
 - [x] `public/CNAME`, `siteConfig.url`, and both `security.txt` copies updated; build verified to
@@ -344,16 +350,16 @@ follow-up that does not block going live on Pages.
 
 Steps 1 and 2 are **already done on the cutover branch** — they land when its PR merges.
 
-1. **`public/CNAME`** contains `www.cactuswrenpreschool.com`, so Pages claims the domain and the
+1. **`public/CNAME`** contains `cactuswrenpreschool.com`, so Pages claims the domain and the
    build switches to the root base path.
-2. **`src/lib/site.config.ts`** `url` is `https://www.cactuswrenpreschool.com`, so canonical URLs,
+2. **`src/lib/site.config.ts`** `url` is `https://cactuswrenpreschool.com`, so canonical URLs,
    `sitemap.xml`, `robots.txt`, and `security.txt` emit the production domain.
 
 3. **Merge the cutover PR**, then let the deploy finish.
 
    > Ordering note: merging makes Pages claim the domain, which causes
    > `freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/` to **301-redirect to
-   > `www.cactuswrenpreschool.com`** — still Wix at this moment. That is expected and harmless:
+   > `cactuswrenpreschool.com`** — still Wix at this moment. That is expected and harmless:
    > visitors keep seeing the old site until DNS changes. It does mean the Pages preview URL stops
    > being a way to view the new site, so **do the final visual review before merging.**
 
@@ -378,7 +384,7 @@ Steps 1 and 2 are **already done on the cutover branch** — they land when its 
    outcome. Do not accept any option that also clears `MX`/`TXT`.
 
 5. **Set the custom domain in GitHub** → Settings → Pages → Custom domain:
-   `www.cactuswrenpreschool.com`. Wait for the DNS check to pass, then **enable "Enforce HTTPS"**.
+   `cactuswrenpreschool.com`. Wait for the DNS check to pass, then **enable "Enforce HTTPS"**.
 
    > Requires the org-level domain verification from the pre-cutover checklist to already be in
    > place. Without it this step can be rejected outright, and it needs an org owner — so confirm it
@@ -386,13 +392,13 @@ Steps 1 and 2 are **already done on the cutover branch** — they land when its 
 
    > "Enforce HTTPS" stays greyed out until GitHub has issued the Let's Encrypt certificate, which
    > only starts once DNS resolves to Pages. Expect a window of minutes to about an hour where
-   > `https://www.cactuswrenpreschool.com` serves a certificate warning. This is normal and clears
+   > `https://cactuswrenpreschool.com` serves a certificate warning. This is normal and clears
    > itself; do not roll back over it. Come back and tick the box once it is selectable.
 
 6. **Verify** after propagation:
 
    ```bash
-   npm run smoke -- https://www.cactuswrenpreschool.com/
+   npm run smoke -- https://cactuswrenpreschool.com/
 
    # From the FFC-Cloudflare-Automation checkout — read-only go/no-go, no dig required:
    node scripts/preflight-cutover.mjs --domains=cactuswrenpreschool.com --marker="Cactus Wren"

@@ -5,13 +5,17 @@
  * All content, media, and documents are served locally so the site is fully
  * decoupled from Wix.
  *
- * NOTE ON URL: the canonical host is www.cactuswrenpreschool.com, claimed by
- * public/CNAME. Because that file exists, the deploy workflow's "Determine base
- * path" step builds with an empty NEXT_PUBLIC_BASE_PATH, so assets resolve from
- * the origin root rather than the /FFC-EX-cactuswrenpreschool.com subpath.
+ * NOTE ON URL: the canonical host is the APEX, cactuswrenpreschool.com, claimed
+ * by public/CNAME. Because that file exists, the deploy workflow's "Determine
+ * base path" step builds with an empty NEXT_PUBLIC_BASE_PATH, so assets resolve
+ * from the origin root rather than the /FFC-EX-cactuswrenpreschool.com subpath.
  *
- * The apex (cactuswrenpreschool.com) redirects to www, which is the behavior
- * Wix served before the cutover — so existing inbound links and SEO are kept.
+ * www.cactuswrenpreschool.com 301-redirects to the apex, which is how the live
+ * site is configured in Settings -> Pages.
+ *
+ * This value and public/CNAME must name the SAME host. The CNAME file in the
+ * deployed artifact overwrites whatever is set in the Pages UI on every deploy,
+ * so a mismatch silently reverses the canonical host at the next deploy.
  */
 
 export type SiteSocialLink = {
@@ -63,7 +67,7 @@ export const siteConfig: SiteConfig = {
   // public/CNAME present the build uses an empty NEXT_PUBLIC_BASE_PATH, so
   // canonical URLs, sitemap.xml, robots.txt and security.txt all emit the
   // production domain from this value.
-  url: 'https://www.cactuswrenpreschool.com',
+  url: 'https://cactuswrenpreschool.com',
   twitterHandle: '',
   contactEmail: 'cactuswrenpreschool@gmail.com',
   keywords: [
