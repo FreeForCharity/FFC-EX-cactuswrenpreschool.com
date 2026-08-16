@@ -41,7 +41,7 @@ jobs:
           cache: 'npm'
 
       - name: Setup Pages
-        uses: actions/configure-pages@v5
+        uses: actions/configure-pages@v6
         with:
           # Auto-enable GitHub Pages (build type: GitHub Actions) on the first
           # run so a brand-new repo deploys without a manual Settings -> Pages
@@ -94,7 +94,7 @@ jobs:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.basepath.outputs.value }}
 
       - name: Upload artifact for Pages
-        uses: actions/upload-pages-artifact@v4
+        uses: actions/upload-pages-artifact@v5
         with:
           path: ./out
 
@@ -109,7 +109,7 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5
 
       - name: Checkout (for smoke-check script)
         uses: actions/checkout@v6
@@ -139,7 +139,7 @@ jobs:
       issues: write
     steps:
       - name: Create incident issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const owner = context.repo.owner;
