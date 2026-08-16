@@ -216,7 +216,14 @@ While automated deployment is recommended, you can also deploy manually if neede
    npm run test:e2e
    ```
 
-4. **Build the site** with the correct base path (matches the current no-CNAME subpath deploy):
+4. **Build the site**. `public/CNAME` is present, so the custom-domain build is the default and needs
+   no base path — this matches what CI produces:
+
+   ```bash
+   npm run build
+   ```
+
+   To reproduce the old github.io subpath build instead (rarely needed):
 
    ```bash
    NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com npm run build
@@ -263,13 +270,13 @@ There is no `gh-pages` branch; the built `./out` directory is uploaded as a Page
 
 The custom domain (`cactuswrenpreschool.com`) is **not yet connected** — DNS still points at Wix. The repo-side preparation (CNAME file, `siteConfig.url`, `security.txt` canonicals) is done; what remains is the DNS change itself. Follow the [DNS Cutover from Apex](#dns-cutover-from-apex-wix--github-pages) runbook below.
 
-Quick reference for the CNAME file (added during cutover):
+Quick reference — the contents of `public/CNAME`:
 
 ```
 www.cactuswrenpreschool.com
 ```
 
-Once `public/CNAME` exists, the **Determine base path** step builds with an empty `NEXT_PUBLIC_BASE_PATH` automatically — no other change needed.
+Because that file exists, the **Determine base path** step builds with an empty `NEXT_PUBLIC_BASE_PATH` automatically — no other change needed.
 
 ---
 
