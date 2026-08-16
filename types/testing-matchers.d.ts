@@ -12,11 +12,13 @@
  * tree, so the errors only appeared under a direct `tsc --noEmit`. A Next.js
  * upgrade changed that and turned a latent problem into a failing build.
  *
- * Referencing the packages here puts the augmentations on a file the compiler
+ * Referencing the package here puts the augmentation on a file the compiler
  * does include, so the matchers are typed no matter which entry point runs the
- * check. `jest-axe` ships no declarations of its own, hence the separate
- * `@types/jest-axe` devDependency.
+ * check.
+ *
+ * `jest-axe`'s side is handled by the local `jest-axe.d.ts` in this directory
+ * rather than by `@types/jest-axe` — see the note there for why that package
+ * was rejected.
  */
 
 /// <reference types="@testing-library/jest-dom" />
-/// <reference types="jest-axe" />
