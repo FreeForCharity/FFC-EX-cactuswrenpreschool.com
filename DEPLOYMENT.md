@@ -330,6 +330,11 @@ follow-up that does not block going live on Pages.
 - [x] `public/CNAME`, `siteConfig.url`, and both `security.txt` copies updated; build verified to
       emit **0** subpath references.
 - [x] Existing zone captured above for rollback.
+- [ ] **A FreeForCharity organization owner has verified `cactuswrenpreschool.com` under
+      Organization Settings → Pages.** This is an org-level step, separate from the repo's own Pages
+      settings, and only an org owner can do it — so it is the item most likely to stall the cutover
+      on someone else's availability. Verifying the domain also stops any other GitHub account from
+      claiming it for their Pages site. Raised on #44.
 - [ ] Confirm Wix DNS panel access for the account holding the domain.
 - [ ] Lower the TTL on the apex `A` and `www` `CNAME` from `3600` to `300`, **at least an hour
       before** the cutover. This is what makes rollback fast — at a 3600s TTL a bad cutover is
@@ -374,6 +379,10 @@ Steps 1 and 2 are **already done on the cutover branch** — they land when its 
 
 5. **Set the custom domain in GitHub** → Settings → Pages → Custom domain:
    `www.cactuswrenpreschool.com`. Wait for the DNS check to pass, then **enable "Enforce HTTPS"**.
+
+   > Requires the org-level domain verification from the pre-cutover checklist to already be in
+   > place. Without it this step can be rejected outright, and it needs an org owner — so confirm it
+   > is done before starting the cutover, not at this point in the sequence.
 
    > "Enforce HTTPS" stays greyed out until GitHub has issued the Let's Encrypt certificate, which
    > only starts once DNS resolves to Pages. Expect a window of minutes to about an hour where
