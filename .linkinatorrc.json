@@ -13,5 +13,7 @@
   "retryErrors": true,
   "retryErrorsCount": 3,
   "retryErrorsJitter": 500,
-  "directoryListing": false
+  "directoryListing": false,
+  "urlRewriteSearch": "^http://127\\.0\\.0\\.1:([0-9]+)/([a-z0-9-]+)$",
+  "urlRewriteReplace": "http://127.0.0.1:$1/$2.html"
 }

@@ -220,7 +220,7 @@ jobs:
         if: steps.url.outputs.skip != 'true'
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
       - name: Install Playwright (chromium only)
         if: steps.url.outputs.skip != 'true'

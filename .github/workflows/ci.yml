@@ -29,7 +29,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
@@ -74,9 +74,20 @@ jobs:
   link-check:
     name: Link check (soft-fail)
     runs-on: ubuntu-latest
-    # Soft-fail today so we can see what linkinator surfaces without
-    # blocking merges. Flip to hard-fail once the noise is understood
-    # — tracked as a follow-up to #289.
+    # The noise this was waiting on is now understood and fixed: the 13
+    # standing failures were linkinator resolving extensionless routes
+    # (`/about-us`) against a static export that emits `about-us.html`, plus
+    # an `og:image` on a domain that was not live yet. `.linkinatorrc.json`
+    # now rewrites origin-local extensionless URLs to their `.html` file, and
+    # the check passes — scanning 129 links rather than 49, because it can
+    # finally crawl into the pages themselves.
+    #
+    # Still soft-fail, but for a different reason than before: every
+    # remaining failure mode is a third-party site being unreachable
+    # (instagram.com, apps.apple.com, azdps.gov). `retry` covers a blip, not
+    # an outage, and blocking a charity's merges on someone else's uptime is
+    # not a trade worth making. Flip this if the external links are ever
+    # skipped or vendored.
     continue-on-error: true
     # Kept as a separate job (not inside test-and-build) so it does not
     # multiply across the Playwright shard matrix introduced by #133.
@@ -88,7 +99,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
