@@ -41,6 +41,8 @@ export const routes: readonly SitemapEntry[] = [
   { path: '/photo-gallery', changeFrequency: 'monthly', priority: 0.5 },
   { path: '/school-supply-lists', changeFrequency: 'yearly', priority: 0.2 },
   { path: '/privacy-policy', changeFrequency: 'yearly', priority: 0.2 },
+  { path: '/cookie-policy', changeFrequency: 'yearly', priority: 0.2 },
+  { path: '/terms-of-service', changeFrequency: 'yearly', priority: 0.2 },
 ]
 
 export default function sitemap(): MetadataRoute.Sitemap {

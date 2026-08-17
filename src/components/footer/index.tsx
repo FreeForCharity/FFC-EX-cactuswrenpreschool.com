@@ -100,6 +100,37 @@ const Footer: React.FC = () => {
       <div className="border-t border-white/15">
         <div className="ffc-container py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/70">
           <p>&copy; {year} Cactus Wren Cooperative Preschool. All rights reserved.</p>
+          {/*
+            Policy links belong in the footer on every page, which is where
+            visitors and compliance scanners both look for them. The privacy
+            policy was previously reachable only by URL: `nav` drives the Quick
+            Links list above and deliberately holds the site's main navigation,
+            so adding it there would have put it in the header menu too.
+          */}
+          <nav aria-label="Policies">
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
+              <li>
+                <Link href="/privacy-policy" className="hover:text-yellow hover:underline">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie-policy" className="hover:text-yellow hover:underline">
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms-of-service" className="hover:text-yellow hover:underline">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/health-policy" className="hover:text-yellow hover:underline">
+                  Health Policy
+                </Link>
+              </li>
+            </ul>
+          </nav>
           <p>A non-profit cooperative preschool &middot; Sierra Vista, Arizona</p>
         </div>
       </div>
