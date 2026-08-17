@@ -53,7 +53,7 @@ jobs:
           static_site_generator: next
 
       - name: Restore Next.js cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         # A build-cache restore is a speed optimisation, never a correctness
         # requirement — `npm ci` and `next build` below produce the same site
         # with or without it. Without this, a fault in the cache action fails
