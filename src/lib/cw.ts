@@ -9,6 +9,16 @@
  * `assetPath()` at render time so GitHub Pages subpath deploys resolve.
  */
 
+/**
+ * The mailing address, defined once as its display lines.
+ *
+ * Both forms are needed — the footer and the scholarship page stack it over
+ * two lines, while prose renders it inline — and before this they were three
+ * separate hardcoded copies that had already drifted on `PO Box` vs
+ * `P.O. Box`. Deriving the one-line form from the lines keeps a single source.
+ */
+const MAILING_LINES = ['P.O. Box 1112', 'Sierra Vista, AZ 85636'] as const
+
 export const contact = {
   director: 'Taylor Brennan',
   directorEmail: 'directorcactuswrenpreschool@gmail.com',
@@ -19,8 +29,12 @@ export const contact = {
   street: '4300 E Golden Acres Dr.',
   city: 'Sierra Vista',
   state: 'AZ',
+  // NOTE: the ADHS child-care licence in public/documents/dhs-license.pdf
+  // gives this street address as Sierra Vista, AZ *85650*. Tracked — this
+  // value is published to search engines as `postalCode` in the JSON-LD.
   zip: '85635',
-  mailing: 'P.O. Box 1112, Sierra Vista, AZ 85636',
+  mailingLines: MAILING_LINES,
+  mailing: MAILING_LINES.join(', '),
   facebook: 'https://www.facebook.com/cactuswrenpreschool',
 } as const
 
@@ -39,6 +53,11 @@ export const nav = [
   { label: 'Health Policy', href: '/health-policy' },
   { label: 'Employment', href: '/employment' },
   { label: 'Documents & Links', href: '/documents-links' },
+  // School Supply Lists had no link anywhere on the site — not in this array,
+  // not in the footer, and not from any page. It was reachable only by typing
+  // the URL, which is the worst possible state for a page families look for
+  // every August. Placed next to Calendar as the other seasonal reference.
+  { label: 'School Supply Lists', href: '/school-supply-lists' },
   { label: 'Contact', href: '/contact' },
 ] as const
 

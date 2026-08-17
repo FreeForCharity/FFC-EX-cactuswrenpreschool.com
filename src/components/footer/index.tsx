@@ -75,10 +75,12 @@ const Footer: React.FC = () => {
                 <span className="font-semibold text-white">Mailing address</span>
                 <br />
                 Cactus Wren Preschool
-                <br />
-                PO Box 1112
-                <br />
-                Sierra Vista, AZ 85636
+                {contact.mailingLines.map((line) => (
+                  <React.Fragment key={line}>
+                    <br />
+                    {line}
+                  </React.Fragment>
+                ))}
               </span>
             </p>
             <p className="flex items-center gap-2">
