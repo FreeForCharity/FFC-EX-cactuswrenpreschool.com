@@ -606,16 +606,25 @@ async function checkFooterAttribution() {
     )
     return
   }
-  // Strip comments before matching. The explanatory block above the markup
-  // names both markers, so a line-prefix filter is not enough — its inner
-  // lines start with ordinary prose, not `*`, and the check then passes on
-  // its own documentation while the real attribution is gone. Caught by
-  // mutation test: renaming the visible link text to "Our Sponsor" was NOT
-  // detected until block comments were removed wholesale.
+  // Strip comments before matching, or the guard can pass on prose instead of
+  // markup. Two ways that happened, both found by mutation test rather than by
+  // reading:
+  //
+  //   1. The explanatory block beside the markup names both markers, and its
+  //      inner lines start with ordinary prose rather than `*` — so a
+  //      line-prefix filter left them in and the check passed on its own
+  //      documentation. Block comments are now removed wholesale.
+  //   2. A *trailing* comment (`foo() // Free For Charity`) survived a
+  //      full-line-only `//` filter and satisfied both markers with the
+  //      attribution deleted.
+  //
+  // The `(?<!:)` is load-bearing: without it the `//` in
+  // `https://freeforcharity.org` is treated as a comment start, truncating the
+  // href to `https:` and making the link check fail on a correct footer.
   const code = body
     .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '') // {/* JSX comment */}
     .replace(/\/\*[\s\S]*?\*\//g, '') // /* block comment */
-    .replace(/^\s*\/\/.*$/gm, '') // // line comment
+    .replace(/(?<!:)\/\/.*$/gm, '') // // line and trailing comments
 
   if (!/Free For Charity/.test(code)) {
     errors.push(
