@@ -54,8 +54,14 @@ const Home = () => {
             Cactus Wren Preschool is now a Contracted Provider with the Department of Economic
             Security!
           </span>
+          {/*
+            Keep this link text descriptive — never "Learn More" or "Click
+            Here". Generic text fails Lighthouse's link-text SEO audit, and it
+            is also what a screen-reader user hears when tabbing a link list
+            out of context, where it conveys nothing about the destination.
+          */}
           <Link href="/scholarship-information" className="underline hover:text-yellow">
-            Learn More
+            Learn more about DES scholarships
           </Link>
         </div>
       </div>
