@@ -133,7 +133,29 @@ const Footer: React.FC = () => {
               </li>
             </ul>
           </nav>
-          <p>A non-profit cooperative preschool &middot; Sierra Vista, Arizona</p>
+          {/*
+            FFC footer standard: every FFC-EX site carries a "Supported by
+            Free For Charity" attribution linking to freeforcharity.org. It is
+            audited live — scripts/gate3-validate.mjs in FFC-IN-ffcadmin.org
+            looks for the brand text and the link as separate markers — and the
+            adoption checklist says never to change or drop it, so keep both
+            the wording and the href intact when restyling.
+
+            This replaced a "A non-profit cooperative preschool · Sierra Vista,
+            Arizona" tagline that duplicated the About column's description
+            immediately above.
+          */}
+          <p>
+            Supported by{' '}
+            <a
+              href="https://freeforcharity.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-yellow"
+            >
+              Free For Charity
+            </a>
+          </p>
         </div>
       </div>
     </footer>
