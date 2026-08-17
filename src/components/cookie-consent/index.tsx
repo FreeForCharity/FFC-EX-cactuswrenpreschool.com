@@ -28,6 +28,77 @@ function isConfigured(id: string): boolean {
   return withoutPrefix.length > 0 && !/^X+$/i.test(withoutPrefix)
 }
 
+/**
+ * The services this site would actually load, derived from the same gate that
+ * decides whether to load them.
+ *
+ * The disclosure text has to be driven by `isConfigured()` rather than written
+ * by hand. The FFC template's copy named Google Analytics, Microsoft Clarity,
+ * Meta Pixel, Zeffy and Microsoft Forms as services in use; Cactus Wren has
+ * none of them, so the banner was telling visitors it analysed their traffic
+ * while the loaders above were correctly refusing to fire — and directly
+ * contradicting /cookie-policy, which says no analytics run. A privacy notice
+ * that overstates collection is a misstatement even when the overstatement is
+ * in the visitor's favour.
+ *
+ * Hardcoding "we don't use analytics" would be just as wrong the day someone
+ * sets NEXT_PUBLIC_GA_MEASUREMENT_ID, and nothing would flag it. Deriving both
+ * the behaviour and the wording from one source means the notice cannot fall
+ * out of step with what the site loads.
+ *
+ * `purposes` exists because analytics and marketing are configured
+ * independently. A single "is anything tracking?" flag would put "analyze
+ * traffic" in front of a visitor on a site that had only a Meta Pixel — the
+ * same overstatement this function exists to prevent, one level up. The
+ * sentence is therefore composed from the categories actually in use rather
+ * than chosen from two fixed strings.
+ *
+ * Exported so every state can be tested. The IDs are read from the environment
+ * once at module scope, so a rendering test cannot vary them without a second
+ * React copy in the module registry — taking them as an argument keeps the
+ * "what would we disclose?" decision testable on its own.
+ */
+export function disclosedServices(ids: { ga: string; clarity: string; meta: string }): {
+  analytics: string[]
+  marketing: string[]
+  purposes: string[]
+  hasTracking: boolean
+} {
+  const analytics = [
+    isConfigured(ids.ga) ? 'Google Analytics' : null,
+    isConfigured(ids.clarity) ? 'Microsoft Clarity' : null,
+  ].filter((s): s is string => s !== null)
+
+  const marketing = [isConfigured(ids.meta) ? 'Meta Pixel (Facebook)' : null].filter(
+    (s): s is string => s !== null
+  )
+
+  const purposes = [
+    analytics.length > 0 ? 'understand how the site is used' : null,
+    marketing.length > 0 ? 'measure whether people who see our posts visit the site' : null,
+  ].filter((s): s is string => s !== null)
+
+  return { analytics, marketing, purposes, hasTracking: purposes.length > 0 }
+}
+
+/** Joins a short list for prose: "a", or "a and b". */
+function joinPurposes(items: string[]): string {
+  return items.length > 1
+    ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+    : items[0]
+}
+
+const {
+  analytics: ANALYTICS_SERVICES,
+  marketing: MARKETING_SERVICES,
+  purposes: TRACKING_PURPOSES,
+  hasTracking: HAS_TRACKING,
+} = disclosedServices({
+  ga: GA_MEASUREMENT_ID,
+  clarity: CLARITY_PROJECT_ID,
+  meta: META_PIXEL_ID,
+})
+
 // Define type for GTM dataLayer events
 interface DataLayerEvent {
   event: string
@@ -54,7 +125,7 @@ export default function CookieConsent() {
   const [showPreferences, setShowPreferences] = useState(false)
   const [preferences, setPreferences] = useState<CookiePreferences>({
     necessary: true, // Always true, cannot be changed
-    functional: true, // Always true, cannot be changed - includes Zeffy donation forms
+    functional: true, // Always true, cannot be changed - cookies set by features the visitor uses
     analytics: false,
     marketing: false,
   })
@@ -398,8 +469,9 @@ export default function CookieConsent() {
               Cookie Preferences
             </h2>
             <p className="text-gray-600 mb-6">
-              We use cookies to enhance your browsing experience and analyze our traffic. You can
-              choose which types of cookies you allow.
+              {HAS_TRACKING
+                ? `We use cookies to enhance your browsing experience and, with your permission, to ${joinPurposes(TRACKING_PURPOSES)}. You can choose which types of cookies you allow.`
+                : 'You can choose which types of cookies you allow. Today only the necessary category is in use — the toggles below record a standing preference that we will honour if we ever add the others.'}
             </p>
 
             {/* Necessary Cookies */}
@@ -438,13 +510,10 @@ export default function CookieConsent() {
                 </div>
               </div>
               <p className="text-sm text-gray-600 mb-2">
-                These cookies enable enhanced functionality and features that are essential for our
-                core services. This includes our donation processing and application form systems
-                which require cookies to function properly.
-              </p>
-              <p className="text-xs text-gray-500">
-                Services: Zeffy (Donation Processing), Microsoft Forms (Application Forms - may
-                include HubSpot analytics)
+                These cookies enable features you actively use, such as an embedded donation or
+                application form. This site currently embeds none &mdash; enrollment happens on
+                Procare&rsquo;s own site, which sets its own cookies under its own policy once you
+                follow the link.
               </p>
             </div>
 
@@ -466,11 +535,16 @@ export default function CookieConsent() {
                 </label>
               </div>
               <p className="text-sm text-gray-600 mb-2">
-                These cookies help us understand how visitors interact with our website by
-                collecting and reporting information anonymously. We use Google Analytics and
-                Microsoft Clarity.
+                These cookies would help us understand how visitors interact with our website, by
+                collecting and reporting information in aggregate.
               </p>
-              <p className="text-xs text-gray-500">Services: Google Analytics, Microsoft Clarity</p>
+              {ANALYTICS_SERVICES.length > 0 ? (
+                <p className="text-xs text-gray-500">Services: {ANALYTICS_SERVICES.join(', ')}</p>
+              ) : (
+                <p className="text-xs text-gray-500">
+                  Not currently in use. Allowing this category loads nothing today.
+                </p>
+              )}
             </div>
 
             {/* Marketing Cookies */}
@@ -491,10 +565,16 @@ export default function CookieConsent() {
                 </label>
               </div>
               <p className="text-sm text-gray-600 mb-2">
-                These cookies are used to track visitors across websites. The intention is to
-                display ads that are relevant and engaging for the individual user.
+                These cookies would be used to measure whether people who see one of our posts go on
+                to visit the site.
               </p>
-              <p className="text-xs text-gray-500">Services: Meta Pixel (Facebook)</p>
+              {MARKETING_SERVICES.length > 0 ? (
+                <p className="text-xs text-gray-500">Services: {MARKETING_SERVICES.join(', ')}</p>
+              ) : (
+                <p className="text-xs text-gray-500">
+                  Not currently in use. Allowing this category loads nothing today.
+                </p>
+              )}
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 mt-6">
@@ -527,12 +607,20 @@ export default function CookieConsent() {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900 mb-2">We Value Your Privacy</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              We use cookies to improve your experience on our site, analyze traffic, and enable
-              certain features. By clicking &quot;Accept All&quot;, you consent to our use of
-              cookies for analytics and marketing purposes. You can manage your preferences or
-              decline non-essential cookies.
-            </p>
+            {HAS_TRACKING ? (
+              <p className="text-sm text-gray-600 mb-3">
+                We use cookies to remember the choice you make here and to enable certain features.
+                With your permission, we would also use them to {joinPurposes(TRACKING_PURPOSES)}.
+                You can manage your preferences or decline non-essential cookies.
+              </p>
+            ) : (
+              <p className="text-sm text-gray-600 mb-3">
+                We use cookies only to remember the choice you make here. We do not run analytics or
+                advertising, so there is nothing else to accept &mdash; we ask anyway, and record
+                your preference in case that ever changes. You can review the details or decline at
+                any time.
+              </p>
+            )}
             <div className="flex items-center gap-4 text-xs text-gray-500">
               <Link href="/privacy-policy" className="text-blue-600 hover:underline">
                 Privacy Policy
