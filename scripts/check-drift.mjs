@@ -580,8 +580,71 @@ async function checkContactLiterals() {
   }
 }
 
+/**
+ * The FFC footer attribution must be present on every page.
+ *
+ * The footer standard (FFC-IN-ffcadmin.org
+ * docs/footer-standard-adoption-checklist.md) requires a "Supported by Free
+ * For Charity" attribution linking to freeforcharity.org, and says explicitly
+ * never to change or drop it. It is validated live by that repo's
+ * scripts/gate3-validate.mjs, which looks for the brand text and the link as
+ * two separate markers — so a restyle that keeps the words but drops the href,
+ * or vice versa, fails the fleet audit.
+ *
+ * Checking both markers separately here means the failure is caught at commit
+ * time in this repo rather than on a fleet-audit run somebody else has to
+ * chase.
+ */
+async function checkFooterAttribution() {
+  const footerPath = join(SRC_DIR, 'components', 'footer', 'index.tsx')
+  let body
+  try {
+    body = await readFile(footerPath, 'utf8')
+  } catch {
+    errors.push(
+      'src/components/footer/index.tsx is missing — the FFC footer attribution lives there.'
+    )
+    return
+  }
+  // Strip comments before matching, or the guard can pass on prose instead of
+  // markup. Two ways that happened, both found by mutation test rather than by
+  // reading:
+  //
+  //   1. The explanatory block beside the markup names both markers, and its
+  //      inner lines start with ordinary prose rather than `*` — so a
+  //      line-prefix filter left them in and the check passed on its own
+  //      documentation. Block comments are now removed wholesale.
+  //   2. A *trailing* comment (`foo() // Free For Charity`) survived a
+  //      full-line-only `//` filter and satisfied both markers with the
+  //      attribution deleted.
+  //
+  // The `(?<!:)` is load-bearing: without it the `//` in
+  // `https://freeforcharity.org` is treated as a comment start, truncating the
+  // href to `https:` and making the link check fail on a correct footer.
+  const code = body
+    .replace(/\{\s*\/\*[\s\S]*?\*\/\s*\}/g, '') // {/* JSX comment */}
+    .replace(/\/\*[\s\S]*?\*\//g, '') // /* block comment */
+    .replace(/(?<!:)\/\/.*$/gm, '') // // line and trailing comments
+
+  if (!/Free For Charity/.test(code)) {
+    errors.push(
+      'Footer is missing the "Free For Charity" attribution text required by the FFC footer ' +
+        'standard. See docs/footer-standard-adoption-checklist.md in FFC-IN-ffcadmin.org — ' +
+        'gate3-validate.mjs checks for this exact brand text on the live site.'
+    )
+  }
+  if (!/href="https:\/\/freeforcharity\.org/.test(code)) {
+    errors.push(
+      'Footer is missing the https://freeforcharity.org link required by the FFC footer standard. ' +
+        'The brand text and the link are audited as separate markers, so one without the other ' +
+        'still fails the fleet audit.'
+    )
+  }
+}
+
 await checkSiteConfigExists()
 await checkSiteConfigUrl()
+await checkFooterAttribution()
 await checkContactLiterals()
 await checkRouteReachability()
 await checkKebabCaseRoutes()
