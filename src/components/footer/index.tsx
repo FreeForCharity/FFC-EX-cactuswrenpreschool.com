@@ -108,10 +108,20 @@ const Footer: React.FC = () => {
             so adding it there would have put it in the header menu too.
           */}
           <nav aria-label="Policies">
-            <ul className="flex items-center gap-4">
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
               <li>
                 <Link href="/privacy-policy" className="hover:text-yellow hover:underline">
                   Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookie-policy" className="hover:text-yellow hover:underline">
+                  Cookie Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms-of-service" className="hover:text-yellow hover:underline">
+                  Terms of Service
                 </Link>
               </li>
               <li>
