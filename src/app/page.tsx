@@ -55,10 +55,10 @@ const Home = () => {
             Security!
           </span>
           {/*
-            Not "Learn More". Lighthouse's link-text audit is the only failing
-            SEO check on this page, and generic link text is also the thing a
-            screen-reader user hears when tabbing a link list out of context —
-            "Learn More" tells them nothing about where it goes.
+            Keep this link text descriptive — never "Learn More" or "Click
+            Here". Generic text fails Lighthouse's link-text SEO audit, and it
+            is also what a screen-reader user hears when tabbing a link list
+            out of context, where it conveys nothing about the destination.
           */}
           <Link href="/scholarship-information" className="underline hover:text-yellow">
             Learn more about DES scholarships
