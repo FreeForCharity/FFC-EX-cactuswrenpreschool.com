@@ -54,6 +54,17 @@ jobs:
 
       - name: Restore Next.js cache
         uses: actions/cache@v5
+        # A build-cache restore is a speed optimisation, never a correctness
+        # requirement — `npm ci` and `next build` below produce the same site
+        # with or without it. Without this, a fault in the cache action fails
+        # the whole job and the charity's site stops receiving updates for a
+        # reason that has nothing to do with the site.
+        #
+        # This also makes the action's own version bumps safe to take: the
+        # cache step appears only in this workflow, which runs on push to
+        # main, so no pull request's CI ever exercises it and a bump cannot
+        # be verified before merge.
+        continue-on-error: true
         with:
           path: |
             .next/cache
