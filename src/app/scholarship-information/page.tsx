@@ -56,16 +56,18 @@ export default function ScholarshipPage() {
           <p>
             Financial assistance is based on availability of funds. Scholarships are available on a
             first-come, first-served basis and fill up quickly. If you are interested in the
-            availability of financial assistance, please contact our director, Taylor Brennan.
+            availability of financial assistance, please contact our director, {contact.director}.
             Applications and all supporting paperwork are accepted electronically via{' '}
             <a href={`mailto:${contact.email}`}>email</a>, or you can mail a hard copy to:
           </p>
           <p className="font-semibold text-ink not-prose">
-            Cactus Wren Preschool — Attn: Scholarships
-            <br />
-            PO Box 1112
-            <br />
-            Sierra Vista, AZ 85636
+            Cactus Wren Preschool &mdash; Attn: Scholarships
+            {contact.mailingLines.map((line) => (
+              <React.Fragment key={line}>
+                <br />
+                {line}
+              </React.Fragment>
+            ))}
           </p>
         </div>
         <div className="mt-6">

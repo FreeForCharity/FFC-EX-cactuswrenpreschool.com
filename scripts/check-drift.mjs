@@ -12,6 +12,10 @@
  *     or public files after a child site rebrands.
  *  5. Two CSPs (public/_headers and src/app/layout.tsx meta tag) drifting
  *     out of sync on third-party origins.
+ *  6. Routes with a page.tsx that nothing links to — they build, deploy and
+ *     appear in the sitemap while no visitor can navigate to them.
+ *  7. Contact facts from src/lib/cw.ts retyped as literals in a page, which
+ *     match on the day they are written and go stale silently afterwards.
  *
  * Run: `node scripts/check-drift.mjs` or `npm run check:drift`.
  * Always resolves paths relative to the repo root, so it works regardless
@@ -448,8 +452,138 @@ async function checkSecurityTxtSync() {
   }
 }
 
+/**
+ * Every route must be reachable by a visitor who only clicks.
+ *
+ * `/school-supply-lists` built, deployed, returned 200 and appeared in
+ * sitemap.xml while having no link from the nav, the footer, or any page —
+ * so it was reachable only by typing the URL. Nothing caught it: the sitemap
+ * test asserts that routes on disk are *listed*, which this page passed, and
+ * a listed-but-unlinked page is exactly what a search engine ranks worst.
+ *
+ * Policy pages are linked from the footer's own markup rather than `nav`, so
+ * they are found by the footer scan rather than allowlisted. The allowlist is
+ * only for routes deliberately reachable another way.
+ */
+async function checkRouteReachability() {
+  const REACHABLE_WITHOUT_LINK = new Set([
+    // Rendered by Next on error/404 rather than navigated to.
+  ])
+
+  let appEntries
+  try {
+    appEntries = await readdir(APP_DIR, { withFileTypes: true })
+  } catch {
+    return
+  }
+
+  const routes = []
+  for (const entry of appEntries) {
+    if (!entry.isDirectory()) continue
+    if (entry.name.startsWith('_') || entry.name.startsWith('(')) continue
+    if (APP_RESERVED.has(entry.name)) continue
+    try {
+      await stat(join(APP_DIR, entry.name, 'page.tsx'))
+      routes.push('/' + entry.name)
+    } catch {
+      // No page.tsx — not a navigable route.
+    }
+  }
+  if (routes.length === 0) return
+
+  // Gather every internal link target across src/, from any of the forms the
+  // codebase uses: `href="/x"`, `href: '/x'`, and `href={'/x'}`.
+  const sourceFiles = await walk(SRC_DIR, (name) => name.endsWith('.tsx') || name.endsWith('.ts'))
+  const linkedFrom = new Map()
+  for (const file of sourceFiles) {
+    const body = await readFile(file, 'utf8')
+    const rel = relative(ROOT, file).split(sep).join('/')
+    for (const m of body.matchAll(/href[=:]\s*\{?\s*['"](\/[a-z0-9-]*)['"]/gi)) {
+      const target = m[1]
+      if (!linkedFrom.has(target)) linkedFrom.set(target, new Set())
+      linkedFrom.get(target).add(rel)
+    }
+  }
+
+  for (const route of routes) {
+    if (REACHABLE_WITHOUT_LINK.has(route)) continue
+    const sources = linkedFrom.get(route)
+    // A page linking only to itself is still orphaned.
+    const external = [...(sources ?? [])].filter(
+      (s) => s !== `src/app${route}/page.tsx` && s !== 'src/app/sitemap.ts'
+    )
+    if (external.length === 0) {
+      errors.push(
+        `Route ${route} is unreachable — nothing under src/ links to it (nav, footer, or another page). ` +
+          `It will build, deploy and appear in the sitemap while no visitor can navigate to it. ` +
+          `Add it to \`nav\` in src/lib/cw.ts, link it from a related page, or add it to ` +
+          `REACHABLE_WITHOUT_LINK in scripts/check-drift.mjs if it is intentionally unlinked.`
+      )
+    }
+  }
+}
+
+/**
+ * Contact facts must come from `cw.ts`, not be retyped into a page.
+ *
+ * The director's name, the mailing address and the phone number were each
+ * duplicated as literals in pages that also imported `contact` for other
+ * fields. Nothing was wrong on the day — every copy matched — which is the
+ * problem: the failure arrives months later as one stale page, silently, when
+ * the director changes and four pages update and one does not.
+ *
+ * Only `src/app` and `src/components` are scanned. `src/lib/cw.ts` is the
+ * definition and must contain these strings; `site.config.ts` legitimately
+ * carries its own copy of the contact email for site-wide metadata.
+ */
+async function checkContactLiterals() {
+  const cwPath = join(SRC_DIR, 'lib', 'cw.ts')
+  let cwBody
+  try {
+    cwBody = await readFile(cwPath, 'utf8')
+  } catch {
+    return
+  }
+
+  // Pull the literal values straight out of cw.ts so this check cannot drift
+  // from the source it is protecting.
+  const field = (name) => cwBody.match(new RegExp(`\\b${name}:\\s*'([^']+)'`))?.[1]
+  const guarded = [
+    ['director', field('director')],
+    ['phone', field('phone')],
+    ['email', field('email')],
+    ['directorEmail', field('directorEmail')],
+    // Match the quoted strings themselves. Splitting the array literal on ','
+    // cuts "Sierra Vista, AZ 85636" in half, and the resulting "Sierra Vista"
+    // fragment then matches the city name in ordinary prose on six pages.
+    ...[
+      ...(cwBody.match(/const MAILING_LINES = \[([^\]]+)\]/)?.[1] ?? '').matchAll(/'([^']+)'/g),
+    ].map((m) => ['mailingLines', m[1]]),
+  ].filter(([, value]) => value)
+
+  const files = [
+    ...(await walk(join(SRC_DIR, 'app'), (n) => n.endsWith('.tsx'))),
+    ...(await walk(join(SRC_DIR, 'components'), (n) => n.endsWith('.tsx'))),
+  ]
+
+  for (const file of files) {
+    const body = await readFile(file, 'utf8')
+    const rel = relative(ROOT, file).split(sep).join('/')
+    for (const [fieldName, value] of guarded) {
+      if (body.includes(value)) {
+        errors.push(
+          `${rel} hardcodes "${value}" — use \`contact.${fieldName}\` from src/lib/cw.ts instead. ` +
+            `A retyped copy matches today and goes stale the moment the real value changes, with nothing to flag it.`
+        )
+      }
+    }
+  }
+}
+
 await checkSiteConfigExists()
 await checkSiteConfigUrl()
+await checkContactLiterals()
+await checkRouteReachability()
 await checkKebabCaseRoutes()
 await checkAssetPathUsage()
 await checkSecrets()
