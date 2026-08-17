@@ -101,28 +101,52 @@ describe('CookieConsent component', () => {
       expect(disclosedServices(PLACEHOLDERS)).toEqual({
         analytics: [],
         marketing: [],
+        purposes: [],
         hasTracking: false,
       })
     })
 
     it('names each service once its ID is real', () => {
-      expect(disclosedServices({ ...PLACEHOLDERS, ga: 'G-CACTUS1234' })).toEqual({
+      expect(disclosedServices({ ...PLACEHOLDERS, ga: 'G-CACTUS1234' })).toMatchObject({
         analytics: ['Google Analytics'],
         marketing: [],
         hasTracking: true,
       })
 
-      expect(disclosedServices({ ...PLACEHOLDERS, clarity: 'abc123xyz0' })).toEqual({
+      expect(disclosedServices({ ...PLACEHOLDERS, clarity: 'abc123xyz0' })).toMatchObject({
         analytics: ['Microsoft Clarity'],
         marketing: [],
         hasTracking: true,
       })
 
-      expect(disclosedServices({ ...PLACEHOLDERS, meta: '123456789012345' })).toEqual({
+      expect(disclosedServices({ ...PLACEHOLDERS, meta: '123456789012345' })).toMatchObject({
         analytics: [],
         marketing: ['Meta Pixel (Facebook)'],
         hasTracking: true,
       })
+    })
+
+    // Analytics and marketing are configured independently, so a single
+    // "is anything tracking?" flag would put a traffic-analysis claim in front
+    // of a visitor on a marketing-only site — the same overstatement these
+    // tests exist to catch, one level up. Each combination is pinned.
+    it('states only the purposes the configured categories actually serve', () => {
+      expect(disclosedServices(PLACEHOLDERS).purposes).toEqual([])
+
+      expect(disclosedServices({ ...PLACEHOLDERS, ga: 'G-CACTUS1234' }).purposes).toEqual([
+        'understand how the site is used',
+      ])
+
+      expect(disclosedServices({ ...PLACEHOLDERS, meta: '123456789012345' }).purposes).toEqual([
+        'measure whether people who see our posts visit the site',
+      ])
+
+      expect(
+        disclosedServices({ ...PLACEHOLDERS, ga: 'G-CACTUS1234', meta: '123456789012345' }).purposes
+      ).toEqual([
+        'understand how the site is used',
+        'measure whether people who see our posts visit the site',
+      ])
     })
 
     // The site as deployed has no tracking IDs, so this is the copy real

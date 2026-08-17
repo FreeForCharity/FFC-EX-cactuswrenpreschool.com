@@ -46,7 +46,14 @@ function isConfigured(id: string): boolean {
  * the behaviour and the wording from one source means the notice cannot fall
  * out of step with what the site loads.
  *
- * Exported so both states can be tested. The IDs are read from the environment
+ * `purposes` exists because analytics and marketing are configured
+ * independently. A single "is anything tracking?" flag would put "analyze
+ * traffic" in front of a visitor on a site that had only a Meta Pixel — the
+ * same overstatement this function exists to prevent, one level up. The
+ * sentence is therefore composed from the categories actually in use rather
+ * than chosen from two fixed strings.
+ *
+ * Exported so every state can be tested. The IDs are read from the environment
  * once at module scope, so a rendering test cannot vary them without a second
  * React copy in the module registry — taking them as an argument keeps the
  * "what would we disclose?" decision testable on its own.
@@ -54,6 +61,7 @@ function isConfigured(id: string): boolean {
 export function disclosedServices(ids: { ga: string; clarity: string; meta: string }): {
   analytics: string[]
   marketing: string[]
+  purposes: string[]
   hasTracking: boolean
 } {
   const analytics = [
@@ -65,12 +73,25 @@ export function disclosedServices(ids: { ga: string; clarity: string; meta: stri
     (s): s is string => s !== null
   )
 
-  return { analytics, marketing, hasTracking: analytics.length > 0 || marketing.length > 0 }
+  const purposes = [
+    analytics.length > 0 ? 'understand how the site is used' : null,
+    marketing.length > 0 ? 'measure whether people who see our posts visit the site' : null,
+  ].filter((s): s is string => s !== null)
+
+  return { analytics, marketing, purposes, hasTracking: purposes.length > 0 }
+}
+
+/** Joins a short list for prose: "a", or "a and b". */
+function joinPurposes(items: string[]): string {
+  return items.length > 1
+    ? `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`
+    : items[0]
 }
 
 const {
   analytics: ANALYTICS_SERVICES,
   marketing: MARKETING_SERVICES,
+  purposes: TRACKING_PURPOSES,
   hasTracking: HAS_TRACKING,
 } = disclosedServices({
   ga: GA_MEASUREMENT_ID,
@@ -449,7 +470,7 @@ export default function CookieConsent() {
             </h2>
             <p className="text-gray-600 mb-6">
               {HAS_TRACKING
-                ? 'We use cookies to enhance your browsing experience and analyze our traffic. You can choose which types of cookies you allow.'
+                ? `We use cookies to enhance your browsing experience and, with your permission, to ${joinPurposes(TRACKING_PURPOSES)}. You can choose which types of cookies you allow.`
                 : 'You can choose which types of cookies you allow. Today only the necessary category is in use — the toggles below record a standing preference that we will honour if we ever add the others.'}
             </p>
 
@@ -588,10 +609,9 @@ export default function CookieConsent() {
             <h3 className="text-lg font-bold text-gray-900 mb-2">We Value Your Privacy</h3>
             {HAS_TRACKING ? (
               <p className="text-sm text-gray-600 mb-3">
-                We use cookies to improve your experience on our site, analyze traffic, and enable
-                certain features. By clicking &quot;Accept All&quot;, you consent to our use of
-                cookies for analytics and marketing purposes. You can manage your preferences or
-                decline non-essential cookies.
+                We use cookies to remember the choice you make here and to enable certain features.
+                With your permission, we would also use them to {joinPurposes(TRACKING_PURPOSES)}.
+                You can manage your preferences or decline non-essential cookies.
               </p>
             ) : (
               <p className="text-sm text-gray-600 mb-3">
