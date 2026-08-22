@@ -196,11 +196,13 @@ export const staff: Person[] = [
     name: 'Carly Vieira',
     role: 'Preschool Teacher',
     photo: `${IMG}/carly-vieira-headshot.jpg`,
+    bio: 'Carly is excited to join Cactus Wren as the Preschool Teacher. She has experience in early childhood education, homeschooling, and leading STEM clubs for children ages 3–8. She is passionate about creating a warm, supportive classroom where every child can learn and thrive. Carly is a mother of two, and her youngest is beginning her first year at Cactus Wren.',
   },
   {
     name: 'Linzy Collister',
     role: 'Preschool Aide',
     photo: `${IMG}/linzy-collister-headshot.jpg`,
+    bio: 'Linzy is delighted to return to Cactus Wren after serving as an aide and substitute in 2023. She has a background in hospice home health care and has dreamed of becoming a teacher since fourth grade. Outside the classroom, she enjoys traveling, trying new foods, and collecting nature’s treasures (like a crow). She and her husband are recent empty nesters who share their home with four cats and two dogs.',
   },
 ]
 
