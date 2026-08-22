@@ -154,7 +154,7 @@ const Home = () => {
         <div className="text-center mb-10">
           <h2 className="cw-display text-3xl text-primary">Our Programs</h2>
           <p className="mt-3 text-ink/70">
-            Small class sizes (max 15 students) with one professional teacher and a qualified aide.
+            Small class sizes (max 16 students) with one professional teacher and a qualified aide.
           </p>
         </div>
         <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
