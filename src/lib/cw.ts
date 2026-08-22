@@ -29,10 +29,9 @@ export const contact = {
   street: '4300 E Golden Acres Dr.',
   city: 'Sierra Vista',
   state: 'AZ',
-  // NOTE: the ADHS child-care licence in public/documents/dhs-license.pdf
-  // gives this street address as Sierra Vista, AZ *85650*. Tracked — this
-  // value is published to search engines as `postalCode` in the JSON-LD.
-  zip: '85635',
+  // The ADHS child-care licence in public/documents/dhs-license.pdf confirms
+  // this street address as Sierra Vista, AZ 85650.
+  zip: '85650',
   mailingLines: MAILING_LINES,
   mailing: MAILING_LINES.join(', '),
   facebook: 'https://www.facebook.com/cactuswrenpreschool',
