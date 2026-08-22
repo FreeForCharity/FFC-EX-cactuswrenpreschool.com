@@ -96,6 +96,15 @@ export const img = {
 
 /** Photos that make up the gallery / virtual tour. */
 export const galleryPhotos = [
+  `${IMG}/gallery-2026-01.png`,
+  `${IMG}/gallery-2026-02.png`,
+  `${IMG}/gallery-2026-03.png`,
+  `${IMG}/gallery-2026-04.png`,
+  `${IMG}/gallery-2026-05.png`,
+  `${IMG}/gallery-2026-06.png`,
+  `${IMG}/gallery-2026-07.png`,
+  `${IMG}/gallery-2026-08.png`,
+  `${IMG}/gallery-2026-09.png`,
   img.classroom2,
   img.classroom1,
   img.classroomWide,
