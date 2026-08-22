@@ -90,7 +90,6 @@ export const img = {
   outdoor: `${IMG}/nsplsh_334d75306951674c51746f_d_6000_4000_s_4_2.jpg`,
   // Hero slideshow photos (genuine school photos from the Photo Gallery)
   heroScience: `${IMG}/457f82_84c1d1756edc4f1da26530e549004ba9.jpg`,
-  heroGroup: `${IMG}/457f82_1baa9dafc2b5410d9003b192bb357880.jpg`,
   heroRug: `${IMG}/457f82_6a92f12db598447086b8884ae4f18847.jpg`,
 } as const
 

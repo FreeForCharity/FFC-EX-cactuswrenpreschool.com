@@ -18,7 +18,6 @@ const heroSlides = [
     src: img.heroScience,
     alt: 'Preschoolers exploring a hands-on science activity at Cactus Wren',
   },
-  { src: img.heroGroup, alt: 'A Cactus Wren class gathered on the rug with their teacher' },
   {
     src: img.classroom2,
     alt: 'Children learning through play at Cactus Wren Cooperative Preschool',
