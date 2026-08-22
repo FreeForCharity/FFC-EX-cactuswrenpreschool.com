@@ -195,10 +195,12 @@ export const staff: Person[] = [
   {
     name: 'Linzy Collister',
     role: 'Preschool Teacher',
+    photo: `${IMG}/linzy-collister-headshot.jpg`,
   },
   {
     name: 'Carly Vieira',
     role: 'Preschool Aide',
+    photo: `${IMG}/carly-vieira-headshot.jpg`,
   },
 ]
 
