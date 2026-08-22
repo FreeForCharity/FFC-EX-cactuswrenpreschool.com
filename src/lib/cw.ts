@@ -83,7 +83,7 @@ export const img = {
   // Candid classroom / school photos
   classroom1: `${IMG}/f61af8_af68d50a36d549c69e1afba4beac982d.jpg`,
   classroom2: `${IMG}/457f82_e1db24bde443448da938fd818e613f1f.jpg`,
-  classroom3: `${IMG}/457f82_b604686ee7b14498ab022fcde6f601ad.jpg`,
+  programPreK: `${IMG}/gallery-2026-02.png`,
   classroom4: `${IMG}/457f82_f0b4774b183e403e9a6071f6a807b086.png`,
   classroom5: `${IMG}/457f82_97b8617813e3466ba819681e0255cac2.png`,
   classroomWide: `${IMG}/f61af8_6458afc5e68c443f99b27457361df8b0.png`,
