@@ -143,7 +143,7 @@ export const board: Person[] = [
     name: 'Shannon Lenzmeier',
     role: 'President',
     photo: `${IMG}/457f82_74863b5c0dc14e1698d1f0a8af4ab4c2.jpg`,
-    bio: "Shannon is thrilled to serve as Cactus Wren's Board President! Her family has loved being part of the school - both of her children attended Cactus Wren from 2021-2026. As a home health physical therapist, she enjoys the flexibility to stay involved in classroom activities and school events. She is excited to help support a welcoming, engaging environment for all Cactus Wren families.",
+    bio: "Shannon is thrilled to serve as Cactus Wren's Board President! Her family has loved being part of the school - both of her children attended Cactus Wren from 2022-2026. As a home health physical therapist, she enjoys the flexibility to stay involved in classroom activities and school events. She is excited to help support a welcoming, engaging environment for all Cactus Wren families.",
   },
   {
     name: 'Chelsea Orozco',
