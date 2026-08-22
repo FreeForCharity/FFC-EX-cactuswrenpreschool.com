@@ -37,7 +37,7 @@ const programs = [
     title: '3-Day Pre-K',
     age: 'Ages 4–5',
     when: 'Tue, Wed & Thu · 8:30 am – 12:30 pm',
-    image: img.classroom3,
+    image: img.programPreK,
   },
 ]
 
