@@ -146,6 +146,12 @@ export const board: Person[] = [
     bio: "Shannon is thrilled to serve as Cactus Wren's Board President! Her family has loved being part of the school - both of her children attended Cactus Wren from 2021-2026. As a home health physical therapist, she enjoys the flexibility to stay involved in classroom activities and school events. She is excited to help support a welcoming, engaging environment for all Cactus Wren families.",
   },
   {
+    name: 'Chelsea Orozco',
+    role: 'Vice President',
+    photo: `${IMG}/chelsea-orozco-headshot.jpg`,
+    bio: 'Chelsea is excited to serve as Vice President of Cactus Wren. She is a stay-at-home mom to two daughters, one of whom attended Cactus Wren last year and is returning this year. Watching her daughter learn, grow, and build friendships has given Chelsea a deep appreciation for the school’s caring community. She looks forward to supporting its teachers, families, and students while helping create a positive and nurturing environment for every child.',
+  },
+  {
     name: 'Stephanie Cespedes',
     role: 'Social Media Manager',
     photo: `${IMG}/457f82_2adefcf8ba164f5394c9125b87a3aad8.jpg`,
