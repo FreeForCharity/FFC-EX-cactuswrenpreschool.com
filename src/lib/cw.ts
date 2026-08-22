@@ -118,14 +118,10 @@ export const galleryPhotos = [
   `${IMG}/457f82_152743dc2d2e4d6e8cf685f2500fe8f9.jpg`,
   `${IMG}/457f82_36b59e23431f43d5a0f5b78d5f731cfc.jpg`,
   `${IMG}/457f82_01244fa6000d4fa898621d7307b65c15.jpg`,
-  `${IMG}/457f82_f15eb6e098ba4c35afc1577a1c1b4a65.jpg`,
-  `${IMG}/457f82_03eae95171c14d0bb145648e43aa83e0.jpg`,
   `${IMG}/457f82_1335ea57dd3f48fe9af7c3748e38ef7e.jpg`,
   `${IMG}/457f82_6a751391f6284b0a8b49e45f43da8ca0.jpg`,
   `${IMG}/457f82_e9314e65905d4affbef85e52fd4ca540.jpg`,
-  `${IMG}/457f82_4dbb5a1fd67c472d8c1cbd7b5dfb8770.jpg`,
   `${IMG}/457f82_063ad0ffecf64c07a4a11547f9049741.png`,
-  `${IMG}/457f82_37a56eef05c545608c031d1b82523c60.jpg`,
   `${IMG}/457f82_cbb93b9e1fe64476b560040029a55cea.jpg`,
 ]
 
