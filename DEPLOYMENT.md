@@ -73,7 +73,7 @@ The GitHub Pages deployment is **healthy and serving**. Feature verification aga
 Re-run this verification any time with the shipped smoke check:
 
 ```bash
-npm run smoke -- https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
+pnpm run smoke -- https://freeforcharity.github.io/FFC-EX-cactuswrenpreschool.com/
 ```
 
 > **Recurring deploy failures (fixed):** On the subpath deploy, the post-deploy smoke check built each manifest-icon URL by concatenating the deploy base URL (which ends in `/FFC-EX-cactuswrenpreschool.com`) onto the icon's manifest `src` (which _already_ includes `/FFC-EX-cactuswrenpreschool.com/…`), producing a doubled path that `404`s **deterministically**. That failed the smoke-check step on every deploy and auto-filed the "Production deployment failed" incidents even though the site itself was healthy. The check now resolves icon `src` values against the origin with `new URL()` so the base path is not doubled, and additionally retries transient `404`s to absorb genuine post-deploy CDN propagation lag.
@@ -131,8 +131,8 @@ The deployment workflow runs automatically when:
 Runs on all pull requests and pushes to main:
 
 1. **Checkout code**: Retrieves the latest code from the repository
-2. **Setup Node.js**: Installs Node.js 20.x
-3. **Install dependencies**: Runs `npm ci` for a clean installation
+2. **Setup Node.js**: Installs Node.js 22.x
+3. **Install dependencies**: Runs `pnpm install --frozen-lockfile` for a clean installation
 4. **Check formatting**: Runs Prettier format check
 5. **Run linting**: Executes ESLint to catch code issues
 6. **Run unit tests**: Executes Jest tests to verify code quality
@@ -149,10 +149,10 @@ Triggered automatically after the CI workflow completes successfully on push to 
 The actual steps performed by the deploy workflow are:
 
 1. **Checkout code**: Retrieves the tested code from the repository
-2. **Setup Node.js**: Installs Node.js 20.x
+2. **Setup Node.js**: Installs Node.js 22.x
 3. **Setup Pages**: Configures GitHub Pages settings
 4. **Restore Next.js cache**: Restores build cache for faster builds
-5. **Install dependencies**: Runs `npm ci` for a clean installation
+5. **Install dependencies**: Runs `pnpm install --frozen-lockfile` for a clean installation
 6. **Determine base path**: Auto-derives `NEXT_PUBLIC_BASE_PATH` from whether `public/CNAME` exists (see below)
 7. **Build site**: Runs `next build` with the derived basePath
 8. **Upload artifact**: Packages the `./out` directory
@@ -195,7 +195,7 @@ While automated deployment is recommended, you can also deploy manually if neede
 
 ### Prerequisites
 
-- Node.js 20.x installed
+- Node.js 22.x installed
 - GitHub CLI (`gh`) or GitHub Personal Access Token
 - Write access to the repository
 
@@ -211,34 +211,34 @@ While automated deployment is recommended, you can also deploy manually if neede
 2. **Install dependencies**:
 
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Run tests** to ensure everything works:
 
    ```bash
-   npm run lint
-   npm test
-   npm run test:e2e
+   pnpm run lint
+   pnpm test
+   pnpm run test:e2e
    ```
 
 4. **Build the site**. `public/CNAME` is present, so the custom-domain build is the default and needs
    no base path — this matches what CI produces:
 
    ```bash
-   npm run build
+   pnpm run build
    ```
 
    To reproduce the old github.io subpath build instead (rarely needed):
 
    ```bash
-   NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com npm run build
+   NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com pnpm run build
    ```
 
 5. **Verify the build**:
 
    ```bash
-   npm run preview
+   pnpm run preview
    # Visit http://localhost:3000 to test
    ```
 
@@ -253,8 +253,8 @@ While automated deployment is recommended, you can also deploy manually if neede
 If deploying to a custom domain (no basePath needed):
 
 ```bash
-npm run build
-npm run preview
+pnpm run build
+pnpm run preview
 ```
 
 The site will be built without a base path, making all assets available at the root.
@@ -398,7 +398,7 @@ Steps 1 and 2 are **already done on the cutover branch** — they land when its 
 6. **Verify** after propagation:
 
    ```bash
-   npm run smoke -- https://cactuswrenpreschool.com/
+   pnpm run smoke -- https://cactuswrenpreschool.com/
 
    # From the FFC-Cloudflare-Automation checkout — read-only go/no-go, no dig required:
    node scripts/preflight-cutover.mjs --domains=cactuswrenpreschool.com --marker="Cactus Wren"
@@ -437,7 +437,7 @@ These variables are embedded during the build process:
 
 ```yaml
 - name: Build with Next.js
-  run: npm run build
+  run: pnpm run build
   env:
     NEXT_PUBLIC_BASE_PATH: ${{ steps.basepath.outputs.value }}
 ```
@@ -501,9 +501,9 @@ NEXT_PUBLIC_CLARITY_PROJECT_ID=
 
 1. Run locally to reproduce:
    ```bash
-   npm run lint
-   npm test
-   npm run build
+   pnpm run lint
+   pnpm test
+   pnpm run build
    ```
 2. Fix any errors reported
 3. Commit and push fixes
@@ -554,10 +554,10 @@ To test the built site locally before deploying:
 
 ```bash
 # Build with GitHub Pages configuration
-NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com npm run build
+NEXT_PUBLIC_BASE_PATH=/FFC-EX-cactuswrenpreschool.com pnpm run build
 
 # Serve the built site
-npm run preview
+pnpm run preview
 
 # Open http://localhost:3000/FFC-EX-cactuswrenpreschool.com in your browser
 ```
@@ -626,9 +626,9 @@ For critical issues requiring immediate rollback:
 
 Before merging to main (which triggers deployment):
 
-- [ ] All tests pass locally (`npm test` and `npm run test:e2e`)
-- [ ] Linting passes (`npm run lint`)
-- [ ] Build succeeds (`npm run build`)
+- [ ] All tests pass locally (`pnpm test` and `pnpm run test:e2e`)
+- [ ] Linting passes (`pnpm run lint`)
+- [ ] Build succeeds (`pnpm run build`)
 - [ ] Manual testing completed on localhost
 - [ ] Screenshots taken for UI changes
 - [ ] Documentation updated

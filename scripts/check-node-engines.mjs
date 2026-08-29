@@ -16,7 +16,7 @@
  *
  * A local test run cannot catch this class of problem, because the local Node
  * is whatever the developer happens to have. Reading the declared `engines`
- * out of the lockfile can, and does so on any machine.
+ * out of the lockfile (pnpm-lock.yaml) can, and does so on any machine.
  *
  * The target version is read from `.nvmrc`, which is also what CI pins, so
  * there is a single source of truth rather than a constant duplicated here.
@@ -51,25 +51,49 @@ async function main() {
     process.exit(1)
   }
 
-  let lock
+  let lockText
   try {
-    lock = JSON.parse(await readFile(join(ROOT, 'package-lock.json'), 'utf8'))
+    lockText = await readFile(join(ROOT, 'pnpm-lock.yaml'), 'utf8')
   } catch {
-    console.error('check-node-engines: could not read package-lock.json')
+    console.error('check-node-engines: could not read pnpm-lock.yaml')
     process.exit(1)
   }
 
+  // Minimal line-based parse of pnpm-lock.yaml's `packages:` section. Entry
+  // keys sit at 2-space indent as 'name@version': and their `engines` field is
+  // emitted in flow style at 4-space indent: engines: {node: '>=22.12'}.
   const offenders = []
-  for (const [path, meta] of Object.entries(lock.packages ?? {})) {
-    const declared = meta?.engines?.node
-    if (!declared) continue
-    const needs = minimumMajor(declared)
-    if (needs !== null && needs > target) {
-      offenders.push({
-        name: path.replace(/^node_modules\//, '') || '(root)',
-        version: meta.version ?? '?',
-        engines: declared,
-      })
+  let inPackages = false
+  let current = null
+  for (const line of lockText.split('\n')) {
+    if (/^packages:\s*$/.test(line)) {
+      inPackages = true
+      continue
+    }
+    if (inPackages && /^\S/.test(line)) inPackages = false // next top-level key
+    if (!inPackages) continue
+    const keyMatch = line.match(/^ {2}'?(.+?)'?:\s*$/)
+    if (keyMatch) {
+      // Strip any peer-dependency suffix — e.g. `pkg@1.2.3(peer@x)` — before
+      // locating the version separator, or lastIndexOf('@') would split at an
+      // `@` inside the parenthesized suffix. Lockfile v9 keeps `packages:`
+      // keys bare, but `snapshots:`-style keys must not mis-split if the
+      // layout ever changes.
+      const key = keyMatch[1].replace(/\(.*$/, '')
+      const at = key.lastIndexOf('@')
+      current =
+        at > 0
+          ? { name: key.slice(0, at), version: key.slice(at + 1) }
+          : { name: key, version: '?' }
+      continue
+    }
+    const engMatch = line.match(/^ {4}engines: \{.*?node: '?([^,}']+)'?/)
+    if (engMatch && current) {
+      const declared = engMatch[1]
+      const needs = minimumMajor(declared)
+      if (needs !== null && needs > target) {
+        offenders.push({ name: current.name, version: current.version, engines: declared })
+      }
     }
   }
 
