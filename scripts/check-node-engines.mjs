@@ -74,7 +74,12 @@ async function main() {
     if (!inPackages) continue
     const keyMatch = line.match(/^ {2}'?(.+?)'?:\s*$/)
     if (keyMatch) {
-      const key = keyMatch[1]
+      // Strip any peer-dependency suffix — e.g. `pkg@1.2.3(peer@x)` — before
+      // locating the version separator, or lastIndexOf('@') would split at an
+      // `@` inside the parenthesized suffix. Lockfile v9 keeps `packages:`
+      // keys bare, but `snapshots:`-style keys must not mis-split if the
+      // layout ever changes.
+      const key = keyMatch[1].replace(/\(.*$/, '')
       const at = key.lastIndexOf('@')
       current =
         at > 0
