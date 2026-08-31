@@ -24,7 +24,9 @@ const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || 'XXXXXX
  * Placeholders are all-X strings behind an optional provider prefix.
  */
 function isConfigured(id: string): boolean {
-  const withoutPrefix = id.replace(/^(G-|GTM-|UA-)/, '')
+  // trim() so a whitespace-padded placeholder (' G-XXXXXXXXXX ') cannot slip
+  // past the placeholder test and load a tag for a nonexistent account.
+  const withoutPrefix = id.trim().replace(/^(G-|GTM-|UA-)/, '')
   return withoutPrefix.length > 0 && !/^X+$/i.test(withoutPrefix)
 }
 

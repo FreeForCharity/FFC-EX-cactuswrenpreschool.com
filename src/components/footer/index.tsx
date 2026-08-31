@@ -5,6 +5,7 @@ import { FaFacebook } from 'react-icons/fa'
 import { FiAtSign, FiMail, FiMapPin, FiPhone } from 'react-icons/fi'
 import { assetPath } from '@/lib/assetPath'
 import { contact, img, nav } from '@/lib/cw'
+import CookiePreferencesButton from '@/components/cookie-consent/CookiePreferencesButton'
 
 const Footer: React.FC = () => {
   const year = new Date().getFullYear()
@@ -130,6 +131,15 @@ const Footer: React.FC = () => {
                 <Link href="/health-policy" className="hover:text-yellow hover:underline">
                   Health Policy
                 </Link>
+              </li>
+              <li>
+                {/* Persistent consent re-entry point (withdrawing consent must
+                    stay as easy as giving it). Renders only once the consent
+                    banner has registered its handler on window. */}
+                <CookiePreferencesButton
+                  className="hover:text-yellow hover:underline"
+                  label="Cookie Preferences"
+                />
               </li>
             </ul>
           </nav>

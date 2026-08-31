@@ -13,7 +13,13 @@
  */
 import { useEffect, useState } from 'react'
 
-export default function CookiePreferencesButton() {
+export default function CookiePreferencesButton({
+  className = 'inline-flex items-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition-colors',
+  label = 'Change cookie settings',
+}: {
+  className?: string
+  label?: string
+}) {
   const [available, setAvailable] = useState(false)
 
   useEffect(() => {
@@ -28,12 +34,8 @@ export default function CookiePreferencesButton() {
   if (!available) return null
 
   return (
-    <button
-      type="button"
-      onClick={() => window.openCookiePreferences?.()}
-      className="inline-flex items-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition-colors"
-    >
-      Change cookie settings
+    <button type="button" onClick={() => window.openCookiePreferences?.()} className={className}>
+      {label}
     </button>
   )
 }
