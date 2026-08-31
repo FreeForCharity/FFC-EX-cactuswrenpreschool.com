@@ -1,5 +1,5 @@
 import React from 'react'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { axe, toHaveNoViolations } from 'jest-axe'
 import Footer from '../../src/components/footer'
 
@@ -54,5 +54,34 @@ describe('Footer component', () => {
     const { container } = render(<Footer />)
     const results = await axe(container)
     expect(results).toHaveNoViolations()
+  })
+
+  describe('cookie preferences entry point', () => {
+    afterEach(() => {
+      delete window.openCookiePreferences
+    })
+
+    it('leaves no empty <li> in the nav when the consent handler is absent', async () => {
+      // The handler is registered by the consent banner, which is not mounted
+      // here — the same state the STATIC EXPORT ships and the state a visitor
+      // with JavaScript disabled stays in. CookiePreferencesButton renders
+      // nothing then, so its list item must not be rendered either: an empty
+      // <li> is counted by a screen reader as a blank entry in the nav list.
+      const { container } = render(<Footer />)
+
+      await waitFor(() => {
+        expect(
+          Array.from(container.querySelectorAll('li')).filter((li) => li.textContent?.trim() === '')
+        ).toHaveLength(0)
+      })
+    })
+
+    it('renders the button inside its own <li> once the handler exists', async () => {
+      window.openCookiePreferences = jest.fn()
+      render(<Footer />)
+
+      const button = await screen.findByRole('button', { name: /cookie preferences/i })
+      expect(button.parentElement?.tagName).toBe('LI')
+    })
   })
 })

@@ -132,15 +132,16 @@ const Footer: React.FC = () => {
                   Health Policy
                 </Link>
               </li>
-              <li>
-                {/* Persistent consent re-entry point (withdrawing consent must
-                    stay as easy as giving it). Renders only once the consent
-                    banner has registered its handler on window. */}
-                <CookiePreferencesButton
-                  className="hover:text-yellow hover:underline"
-                  label="Cookie Preferences"
-                />
-              </li>
+              {/* Persistent consent re-entry point (withdrawing consent must
+                  stay as easy as giving it). Renders only once the consent
+                  banner has registered its handler on window — the `as="li"`
+                  is what keeps the list item away too, instead of leaving an
+                  empty one in the nav. */}
+              <CookiePreferencesButton
+                as="li"
+                className="hover:text-yellow hover:underline"
+                label="Cookie Preferences"
+              />
             </ul>
           </nav>
           {/*

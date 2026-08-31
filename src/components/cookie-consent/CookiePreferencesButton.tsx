@@ -10,15 +10,27 @@
  * If the consent component has not mounted (JavaScript disabled, or the script
  * failed), the handler is absent — so the button is only rendered once the
  * handler actually exists, rather than offering a control that does nothing.
+ *
+ * Because it can render nothing, a caller that needs a wrapper element must
+ * pass it as `as` rather than wrap the component itself: a caller-side
+ * `<li><CookiePreferencesButton /></li>` leaves an EMPTY `<li>` in the markup
+ * whenever the button is absent, which is what the static export ships and
+ * what a screen reader counts as a blank entry in the nav list.
  */
 import { useEffect, useState } from 'react'
 
 export default function CookiePreferencesButton({
   className = 'inline-flex items-center rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-dark transition-colors',
   label = 'Change cookie settings',
+  as: Wrapper,
 }: {
   className?: string
   label?: string
+  /**
+   * Element to wrap the button in. Rendered only when the button itself is,
+   * so a list caller gets no empty `<li>`. Omit for a bare button.
+   */
+  as?: 'li'
 }) {
   const [available, setAvailable] = useState(false)
 
@@ -33,9 +45,11 @@ export default function CookiePreferencesButton({
 
   if (!available) return null
 
-  return (
+  const button = (
     <button type="button" onClick={() => window.openCookiePreferences?.()} className={className}>
       {label}
     </button>
   )
+
+  return Wrapper ? <Wrapper>{button}</Wrapper> : button
 }
