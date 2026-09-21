@@ -25,10 +25,10 @@
     "check:engines": "node scripts/check-node-engines.mjs"
   },
   "dependencies": {
-    "next": "^16.3.1",
-    "postcss": "^8.5.26",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
+    "next": "^16.3.5",
+    "postcss": "^8.5.28",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
     "react-icons": "^5.7.0"
   },
   "devDependencies": {
