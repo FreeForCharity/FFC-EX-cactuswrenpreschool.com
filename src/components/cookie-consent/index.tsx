@@ -24,7 +24,9 @@ const CLARITY_PROJECT_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || 'XXXXXX
  * Placeholders are all-X strings behind an optional provider prefix.
  */
 function isConfigured(id: string): boolean {
-  const withoutPrefix = id.replace(/^(G-|GTM-|UA-)/, '')
+  // trim() so a whitespace-padded placeholder (' G-XXXXXXXXXX ') cannot slip
+  // past the placeholder test and load a tag for a nonexistent account.
+  const withoutPrefix = id.trim().replace(/^(G-|GTM-|UA-)/, '')
   return withoutPrefix.length > 0 && !/^X+$/i.test(withoutPrefix)
 }
 
@@ -113,6 +115,28 @@ declare global {
   }
 }
 
+/**
+ * Serialises a value for embedding inside an inline `<script>` body.
+ *
+ * `JSON.stringify` supplies the surrounding quotes and escapes quotes and
+ * newlines, but it does NOT escape `<` — so a value containing `</script>`
+ * would still close the element early and let the remainder be parsed as
+ * markup. Escaping `<` closes that. U+2028/U+2029 are escaped too: they are
+ * legal inside a JSON string but were illegal in a JS string literal before
+ * ES2019.
+ *
+ * The IDs these wrap are build-time values set by a maintainer, not by a
+ * visitor, so this is defence in depth rather than a live hole. It matters
+ * because `isConfigured()` only rejects placeholder values — it does not
+ * validate shape, so nothing else checks what reaches the script body.
+ */
+export function scriptString(value: string): string {
+  return JSON.stringify(value)
+    .replace(/</g, '\\u003c')
+    .replace(/\u2028/g, '\\u2028')
+    .replace(/\u2029/g, '\\u2029')
+}
+
 interface CookiePreferences {
   necessary: boolean
   functional: boolean
@@ -152,7 +176,7 @@ export default function CookieConsent() {
         window.dataLayer = window.dataLayer || [];
         function gtag(){dataLayer.push(arguments);}
         gtag('js', new Date());
-        gtag('config', '${GA_MEASUREMENT_ID}', {
+        gtag('config', ${scriptString(GA_MEASUREMENT_ID)}, {
           'anonymize_ip': true,
           'cookie_flags': 'SameSite=Lax${secureFlag}'
         });
@@ -177,7 +201,7 @@ export default function CookieConsent() {
         t.src=v;s=b.getElementsByTagName(e)[0];
         s.parentNode.insertBefore(t,s)}(window, document,'script',
         'https://connect.facebook.net/en_US/fbevents.js');
-        fbq('init', '${META_PIXEL_ID}');
+        fbq('init', ${scriptString(META_PIXEL_ID)});
         fbq('track', 'PageView');
       `
       document.head.appendChild(fbScript)
@@ -205,54 +229,93 @@ export default function CookieConsent() {
           c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
           t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
           y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-        })(window, document, "clarity", "script", "${CLARITY_PROJECT_ID}");
+        })(window, document, "clarity", "script", ${scriptString(CLARITY_PROJECT_ID)});
       `
       document.head.appendChild(clarityScript)
     }
   }, [])
 
-  const deleteAnalyticsCookies = useCallback(() => {
-    // List of static cookie names to delete
-    const cookiesToDelete = ['_ga', '_gid', '_fbp', 'fr', '_clck', '_clsk']
-
-    // Delete static cookies
-    cookiesToDelete.forEach((name) => {
-      // Delete for current domain
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-      // Also try to delete with domain specification
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`
-    })
-
-    // Dynamically delete all cookies matching _ga_* (e.g., _ga_G-XXXXXXXXXX)
-    if (typeof document !== 'undefined') {
-      document.cookie.split(';').forEach((cookie) => {
-        const cookieName = cookie.split('=')[0].trim()
-        if (cookieName.startsWith('_ga_')) {
-          // Delete for current domain
-          document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
-          // Also try to delete with domain specification
-          document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=${window.location.hostname};`
-        }
-      })
+  // Expires each name host-only AND against every registrable-domain
+  // candidate for the current hostname. A cookie set with
+  // `domain=.cactuswrenpreschool.com` is NOT removed by a host-only expiry
+  // of the same name, so expiring only the current hostname left the cookie
+  // in place while reporting success.
+  const expireCookies = useCallback((names: string[]) => {
+    const labels = window.location.hostname.split('.')
+    const domains: string[] = []
+    for (let i = 0; i <= labels.length - 2; i++) {
+      const suffix = labels.slice(i).join('.')
+      domains.push(suffix, `.${suffix}`)
     }
+
+    names.forEach((name) => {
+      const expiry = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`
+      // Host-only (no domain attribute).
+      document.cookie = expiry
+      domains.forEach((domain) => {
+        document.cookie = `${expiry} domain=${domain};`
+      })
+    })
   }, [])
 
+  // Expires the cookies of each category that is NOT granted in `prefs`.
+  // Analytics covers GA4 + Microsoft Clarity; marketing covers the Meta
+  // Pixel. Called with no argument it drops both categories.
+  //
+  // Keyed on the RESULTING preference state, not on what changed: the
+  // previous version expired one flat list whenever EITHER category was
+  // withdrawn, so a visitor who turned marketing off lost the analytics
+  // cookies they were still consenting to.
+  //
+  // Only cookies scoped to THIS site's domain can be expired here — that is
+  // all document.cookie can reach. A genuinely third-party cookie (the copy
+  // of Meta's `fr` held on facebook.com) is beyond it; `fr` is listed only
+  // to clear a first-party copy where one exists.
+  const deleteTrackingCookies = useCallback(
+    (prefs?: CookiePreferences) => {
+      const deleteAnalytics = !prefs || !prefs.analytics
+      const deleteMarketing = !prefs || !prefs.marketing
+
+      if (deleteAnalytics) {
+        expireCookies(['_ga', '_gid', '_clck', '_clsk'])
+
+        // Dynamically delete all cookies matching _ga_* (e.g., _ga_G-XXXXXXXXXX)
+        if (typeof document !== 'undefined') {
+          const regex = /(?:^|;\s*)(_ga_[^=;\s]*)/g
+          const cookieStr = document.cookie
+          const found: string[] = []
+          let match: RegExpExecArray | null
+          while ((match = regex.exec(cookieStr)) !== null) {
+            found.push(match[1])
+          }
+          expireCookies(found)
+        }
+      }
+
+      if (deleteMarketing) {
+        // `fr` is normally a THIRD-party cookie scoped to facebook.com,
+        // which document.cookie on this origin cannot touch — expiring it
+        // here is a harmless no-op kept for the rare first-party variant.
+        expireCookies(['_fbp', 'fr'])
+      }
+    },
+    [expireCookies]
+  )
+
   const applyConsent = useCallback(
-    (prefs: CookiePreferences, previousPrefs?: CookiePreferences) => {
+    (prefs: CookiePreferences) => {
       // Set a cookie to indicate consent status with Secure flag (only on HTTPS)
       const cookieValue = JSON.stringify(prefs)
       const secureFlag =
         typeof window !== 'undefined' && window.location.protocol === 'https:' ? '; Secure' : ''
       document.cookie = `cookie-consent=${encodeURIComponent(cookieValue)}; path=/; max-age=31536000; SameSite=Lax${secureFlag}`
 
-      // Check if consent was withdrawn and delete cookies if needed
-      if (previousPrefs) {
-        if (
-          (previousPrefs.analytics && !prefs.analytics) ||
-          (previousPrefs.marketing && !prefs.marketing)
-        ) {
-          deleteAnalyticsCookies()
-        }
+      // Delete each non-granted category's cookies on EVERY apply, not only
+      // on withdrawal of a stored grant. A first-time visitor who declines
+      // had no previous preferences to compare against, so the old
+      // transition check silently did nothing for them.
+      if (!prefs.analytics || !prefs.marketing) {
+        deleteTrackingCookies(prefs)
       }
 
       // Push consent update to GTM dataLayer
@@ -275,7 +338,7 @@ export default function CookieConsent() {
         loadMetaPixel()
       }
     },
-    [deleteAnalyticsCookies, loadGoogleAnalytics, loadMetaPixel, loadMicrosoftClarity]
+    [deleteTrackingCookies, loadGoogleAnalytics, loadMetaPixel, loadMicrosoftClarity]
   )
 
   // Helper to load preferences from localStorage and update state
@@ -395,7 +458,7 @@ export default function CookieConsent() {
       // If localStorage is unavailable, continue anyway
       console.warn('Unable to save preferences to localStorage:', e)
     }
-    applyConsent(allAccepted, savedPreferencesBackup)
+    applyConsent(allAccepted)
     setSavedPreferencesBackup(allAccepted)
     setShowBanner(false)
   }
@@ -415,10 +478,10 @@ export default function CookieConsent() {
       console.warn('Unable to save preferences to localStorage:', e)
     }
 
-    // Delete third-party cookies when consent is withdrawn
-    deleteAnalyticsCookies()
-
-    applyConsent(onlyNecessary, savedPreferencesBackup)
+    // No explicit deletion here: applyConsent deletes every non-granted
+    // category, and `onlyNecessary` grants neither. Calling it here as well
+    // duplicated every expiry write, once per domain candidate.
+    applyConsent(onlyNecessary)
     setSavedPreferencesBackup(onlyNecessary)
     setShowBanner(false)
   }
@@ -430,7 +493,7 @@ export default function CookieConsent() {
       // If localStorage is unavailable, continue anyway
       console.warn('Unable to save preferences to localStorage:', e)
     }
-    applyConsent(preferences, savedPreferencesBackup)
+    applyConsent(preferences)
     setSavedPreferencesBackup(preferences)
     setShowBanner(false)
     setShowPreferences(false)
